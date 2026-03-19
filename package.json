@@ -11,19 +11,21 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.13.6",
+    "@pinia/nuxt": "^0.11.3",
     "@vueuse/core": "^14.2.1",
     "axios": "^1.13.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "defu": "^6.1.4",
     "lucide-vue-next": "^0.575.0",
     "nuxt": "^4.3.1",
     "nuxt-ssr-api-logger": "^2.0.2",
-    "reka-ui": "^2.8.2",
+    "reka-ui": "^2.9.2",
     "shadcn-nuxt": "^2.4.3",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7",
     "vue": "^3.5.28",
-    "vue-router": "^4.6.4"
+    "vue-sonner": "^2.0.9"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.1",

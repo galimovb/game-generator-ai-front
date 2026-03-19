@@ -14,7 +14,9 @@ export interface Game {
     isPublic: boolean | null
     stages: Stage[]
     createdAt: string
-    updatedAt: string | null
+    updatedAt: string | null,
+    likesCount: number,
+    commentsCount: number
 }
 
 export interface Stage {

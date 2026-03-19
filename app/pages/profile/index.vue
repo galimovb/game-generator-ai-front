@@ -1,139 +1,96 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { Camera, Loader } from 'lucide-vue-next'
-import type { UserProfile } from "../../types/user";
 
-const { get, patch } = useApi()
-const config = useRuntimeConfig()
+const profileStore = useProfileStore()
 
-// Состояние редактирования
+if (process.server) {
+  await profileStore.fetchProfile()
+} else {
+  if (!profileStore.profile) {
+    await profileStore.fetchProfile()
+  }
+}
+
 const isEditing = ref(false)
-const editForm = ref({
-  name: '',
-  lastName: '',
-  middleName: '',
-  email: '',
-  login: ''
-})
+const editForm = ref(profileStore.getProfileForm())
 
-// Получаем данные профиля
-const { data: profile } = await useAsyncData<{ result: UserProfile }>('profile', () =>
-    get('/users/profile')
-)
-
-// Инициализация формы при загрузке данных
-watchEffect(() => {
-  if (profile.value?.result) {
+watch(() => profileStore.profile, (newProfile) => {
+  if (newProfile && !isEditing.value) {
     editForm.value = {
-      name: profile.value.result.name || '',
-      lastName: profile.value.result.lastName || '',
-      middleName: profile.value.result.middleName || '',
-      email: profile.value.result.email || '',
-      login: profile.value.result.login || ''
+      name: newProfile.name || '',
+      lastName: newProfile.lastName || '',
+      middleName: newProfile.middleName || '',
+      email: newProfile.email || '',
+      login: newProfile.login || ''
     }
   }
-})
+}, { immediate: true })
 
-// Состояние для загрузки аватара
-const uploading = ref(false)
-const uploadError = ref('')
-const avatarPreview = ref<string | null>(null)
-
-// Обработка выбора файла
 const handleAvatarSelect = async (event: Event) => {
   const input = event.target as HTMLInputElement
   if (!input.files?.length) return
 
-  const file = input.files[0]
-
-  if (!file.type.startsWith('image/')) {
-    uploadError.value = 'Можно загружать только изображения'
-    return
+  try {
+    await profileStore.uploadAvatar(input.files[0])
+  } catch (error) {
+    console.error('Avatar upload failed:', error)
+  } finally {
+    input.value = ''
   }
-
-  if (file.size > 5 * 1024 * 1024) {
-    uploadError.value = 'Размер файла не должен превышать 5MB'
-    return
-  }
-
-  const reader = new FileReader()
-  reader.onload = async (e) => {
-    const base64 = e.target?.result as string
-    avatarPreview.value = base64
-    uploading.value = true
-    uploadError.value = ''
-
-    try {
-      const response = await patch('/users/profile', { avatar: base64 })
-      profile.value.result = response.result
-      avatarPreview.value = null
-    } catch (err: any) {
-      uploadError.value = err.data?.message || 'Ошибка при загрузке аватара'
-    } finally {
-      uploading.value = false
-      input.value = ''
-    }
-  }
-  reader.readAsDataURL(file)
 }
 
-// Сохранение изменений
 const saveChanges = async () => {
   try {
-    const response = await patch('/users/profile', editForm.value)
-    profile.value.result = response.result
+    await profileStore.updateProfile(editForm.value)
     isEditing.value = false
-  } catch (err: any) {
-    console.error('Ошибка сохранения:', err)
+  } catch (err) {
+    console.error('Save failed:', err)
   }
 }
 
-// Отмена редактирования
 const cancelEdit = () => {
-  if (profile.value?.result) {
-    editForm.value = {
-      name: profile.value.result.name || '',
-      lastName: profile.value.result.lastName || '',
-      middleName: profile.value.result.middleName || '',
-      email: profile.value.result.email || '',
-      login: profile.value.result.login || ''
-    }
-  }
+  editForm.value = profileStore.getProfileForm()
   isEditing.value = false
 }
 
-// URL аватара
-const avatarUrl = computed(() => {
-  if (avatarPreview.value) return avatarPreview.value
-  return profile.value?.result?.avatar
-      ? `${config.public.apiBase}${profile.value.result.avatar}`
-      : 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'
-})
+const {
+  avatarUrl,
+  uploading,
+  uploadError,
+  profile,
+  error
+} = storeToRefs(profileStore)
 </script>
 
 <template>
   <div class="max-w-3xl mx-auto py-8 px-4">
-    <div class="border rounded-lg p-6">
+    <div v-if="error" class="text-center py-12">
+      <p>{{ error }}</p>
+      <Button @click="profileStore.fetchProfile(true)" class="mt-4">
+        Повторить
+      </Button>
+    </div>
+
+    <div v-else class="border rounded-lg p-6">
       <div class="flex gap-8">
-        <!-- Аватар -->
-        <div class="w-48 flex-shrink-0">
+        <div class="w-28 h-28 md:w-48 md:h-48 flex-shrink-0">
           <div class="relative">
-            <div class="w-48 h-48 rounded-lg overflow-hidden border bg-gray-50">
+            <div class="w-28 h-28 md:w-48 md:h-48 rounded-lg overflow-hidden border bg-muted">
               <img
                   :src="avatarUrl"
-                  :alt="profile?.result?.name || 'Avatar'"
+                  :alt="profileStore.profile?.name || 'Avatar'"
                   class="w-full h-full object-cover"
               >
               <div
                   v-if="uploading"
-                  class="absolute inset-0 bg-black/50 flex items-center justify-center"
+                  class="absolute inset-0 bg-background/50 flex items-center justify-center"
               >
-                <Loader class="w-8 h-8 animate-spin text-white" />
+                <Loader class="w-8 h-8 animate-spin" />
               </div>
             </div>
 
             <label class="absolute -bottom-2 -right-2 cursor-pointer">
-              <div class="bg-blue-600 text-white rounded-full p-2.5 shadow-lg hover:bg-blue-700 transition-colors">
+              <div class="bg-primary text-primary-foreground rounded-full p-2.5 shadow-lg hover:bg-primary/90">
                 <Camera class="w-5 h-5" />
               </div>
               <input
@@ -145,16 +102,13 @@ const avatarUrl = computed(() => {
               >
             </label>
           </div>
-          <p v-if="uploadError" class="text-sm text-red-500 mt-2">{{ uploadError }}</p>
-          <p class="text-xs text-gray-500 mt-2">JPG, PNG, GIF до 5MB</p>
+          <p v-if="uploadError" class="text-sm text-destructive mt-2">{{ uploadError }}</p>
+          <p class="text-xs text-muted-foreground mt-2">JPG, PNG, GIF до 5MB</p>
         </div>
 
-        <!-- Данные профиля -->
-        <div class="flex-1 space-y-2">
-          <div class="flex justify-between">
-            <h1 class="font-semibold">
-              Профиль
-            </h1>
+        <div class="flex-1">
+          <div class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-semibold">Профиль</h1>
             <Button
                 v-if="!isEditing"
                 @click="isEditing = true"
@@ -168,7 +122,7 @@ const avatarUrl = computed(() => {
             <!-- Имя -->
             <div>
               <Label>Имя</Label>
-              <div v-if="!isEditing" class="text-base">{{ profile?.result?.name || '—' }}</div>
+              <div v-if="!isEditing" class="text-base">{{ profile?.name || '—' }}</div>
               <input
                   v-else
                   v-model="editForm.name"
@@ -181,7 +135,7 @@ const avatarUrl = computed(() => {
             <!-- Фамилия -->
             <div>
               <Label>Фамилия</Label>
-              <div v-if="!isEditing" class="text-base">{{ profile?.result?.lastName || '—' }}</div>
+              <div v-if="!isEditing" class="text-base">{{ profile?.lastName || '—' }}</div>
               <input
                   v-else
                   v-model="editForm.lastName"
@@ -194,7 +148,7 @@ const avatarUrl = computed(() => {
             <!-- Отчество -->
             <div>
               <Label>Отчество</Label>
-              <div v-if="!isEditing" class="text-base">{{ profile?.result?.middleName || '—' }}</div>
+              <div v-if="!isEditing" class="text-base">{{ profile?.middleName || '—' }}</div>
               <Input
                   v-else
                   v-model="editForm.middleName"
@@ -206,7 +160,7 @@ const avatarUrl = computed(() => {
             <!-- Почта -->
             <div>
               <Label>Почта</Label>
-              <div v-if="!isEditing" class="text-base">{{ profile?.result?.email || '—' }}</div>
+              <div v-if="!isEditing" class="text-base">{{ profile?.email || '—' }}</div>
               <Input
                   v-else
                   v-model="editForm.email"
@@ -218,7 +172,7 @@ const avatarUrl = computed(() => {
             <!-- Логин -->
             <div>
               <Label>Логин</Label>
-              <div v-if="!isEditing" class="text-base">{{ profile?.result?.login || '—' }}</div>
+              <div v-if="!isEditing" class="text-base">{{ profile?.login || '—' }}</div>
               <Input
                   v-else
                   v-model="editForm.login"

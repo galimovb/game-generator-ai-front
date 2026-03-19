@@ -22,11 +22,8 @@ const handleSubmit = async () => {
     })
 
     await navigateTo('/')
-
   } catch (err) {
     error.value = err.data?.message || 'Ошибка при входе'
-  } finally {
-    await navigateTo('/profile')
   }
 }
 </script>

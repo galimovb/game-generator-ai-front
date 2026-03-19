@@ -11,7 +11,10 @@ export default defineNuxtConfig({
     ]
   },
 
-  modules: ['shadcn-nuxt', 'nuxt-ssr-api-logger'],
+  modules: ['shadcn-nuxt', '@pinia/nuxt'],
+  pinia: {
+    storesDirs: ['./stores/**'],
+  },
   shadcn: {
     /**
      * Prefix for all the imported component.
