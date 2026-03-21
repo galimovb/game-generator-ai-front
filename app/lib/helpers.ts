@@ -1,17 +1,15 @@
-import type {UserProfile} from "../types/user";
-
 export const getPhotoUrl = (path: string):string => {
     const config = useRuntimeConfig()
     return `${config.public.apiBase}${path}`
 }
 
-export const getUserFullName = (author: UserProfile) => {
+export const getUserFullName = (author: UserProfile):string => {
     if (!author) return ''
     const parts = [author.lastName, author.name].filter(Boolean)
     return parts.length ? parts.join(' ') : author.email
 }
 
-export const formatDate = (date:string):Date => {
+export const formatDate = (date:string):string => {
     return new Date(date).toLocaleString('ru-RU', {
         hour: '2-digit',
         minute: '2-digit',
@@ -20,7 +18,7 @@ export const formatDate = (date:string):Date => {
     })
 }
 
-export const goToGame = (gameId: number) => {
+export const goToGame = (gameId: number):void => {
     const router = useRouter()
-    router.push(`/games/${gameId}`)
+    navigateTo(`/games/${gameId}`)
 }

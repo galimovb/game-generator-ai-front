@@ -9,7 +9,7 @@ const limit = ref<number>(20)
 const { data: gamesResponse, pending } = await useAsyncData<{ result: { items: Game[], pagination: { total: number } } }>(
     'games-list',
     async (): Promise<{ result: { items: Game[], pagination: { total: number } } }> => {
-      return await get('/games/favorite', {
+      return await get('/games/liked', {
         query: { page: page.value, limit: limit.value }
       })
     },

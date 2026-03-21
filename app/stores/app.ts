@@ -11,18 +11,6 @@ export const useAppData = defineStore('appData', () => {
     const availableFontSize = ['13', '14', '15', '16', '17', '18', '19', '20']
     const availableRadius = ['0', '0.25', '0.5', '0.75', '1']
 
-    const availableColors = {
-        //default: { label: 'Сланец', preview: '#334155' },
-        zinc: { label: 'Цинк', preview: '#3f3f46' },
-        gray: { label: 'Пепел', preview: '#374151' },
-        green: { label: 'Зелень', preview: '#15803d' },
-        rose: { label: 'Роза', preview: '#be123c' },
-        orange: { label: 'Заря', preview: '#c2410c' },
-        sky: { label: 'Небо', preview: '#0ea5e9' },
-        blue: { label: 'Лазурь', preview: '#1d4ed8' },
-        purple: { label: 'Лилия', preview: '#6d28d9' }
-    }
-
     function setTheme(newTheme: 'light' | 'dark') {
         theme.value = newTheme
     }
@@ -67,12 +55,6 @@ export const useAppData = defineStore('appData', () => {
         document.documentElement.setAttribute('data-font', fontSize.value || '16')
     }
 
-    // Применяем настройки при инициализации
-    applyTheme()
-    applyColor()
-    applyRadius()
-    applyFont()
-
     watch(theme, applyTheme)
     watch(color, applyColor)
     watch(radius, applyRadius)
@@ -86,7 +68,6 @@ export const useAppData = defineStore('appData', () => {
         isDarkTheme,
         availableFontSize,
         availableRadius,
-        availableColors,
         setTheme,
         setFont,
         setRadius,

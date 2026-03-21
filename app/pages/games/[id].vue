@@ -270,16 +270,6 @@ const removeStageProp = (stageId: number, propIndex: number) => {
   stageForms.value[stageId].props.splice(propIndex, 1)
 }
 
-// Локация текстом
-const locationText = computed(() => {
-  switch (game.value?.locationType) {
-    case 'indoor': return 'В помещении'
-    case 'outdoor': return 'На улице'
-    case 'both': return 'Оба варианта'
-    default: return '—'
-  }
-})
-
 // Загрузка при монтировании
 onMounted(async () => {
   await loadData()
@@ -471,7 +461,7 @@ onMounted(async () => {
               </div>
               <div class="space-y-1">
                 <Label class="text-xs">Локация</Label>
-                <p class="text-sm font-medium">{{ locationText }}</p>
+                <p class="text-sm font-medium">{{ gameLocationTypes[game?.locationType] }}</p>
               </div>
             </div>
 
@@ -776,9 +766,12 @@ onMounted(async () => {
                     <SelectValue placeholder="Выберите тип" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="indoor">В помещении</SelectItem>
-                    <SelectItem value="outdoor">На улице</SelectItem>
-                    <SelectItem value="both">Оба варианта</SelectItem>
+                    <SelectItem
+                        v-for="(value, key) in gameLocationTypes"
+                        :value="key"
+                    >
+                      {{value}}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>

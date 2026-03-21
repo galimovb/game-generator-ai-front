@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import {UserLogin} from "../../types/user";
 import { Loader } from 'lucide-vue-next'
 
 definePageMeta({

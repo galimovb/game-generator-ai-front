@@ -3,16 +3,17 @@ import { Camera, Loader } from 'lucide-vue-next'
 
 const profileStore = useProfileStore()
 
-if (process.server) {
-  await profileStore.fetchProfile()
-} else {
-  if (!profileStore.profile) {
-    await profileStore.fetchProfile()
-  }
-}
-
 const isEditing = ref(false)
 const editForm = ref(profileStore.getProfileForm())
+
+const {
+  avatarUrl,
+  uploading,
+  uploadError,
+  profile,
+  error,
+  loading
+} = storeToRefs(profileStore)
 
 watch(() => profileStore.profile, (newProfile) => {
   if (newProfile && !isEditing.value) {
@@ -52,25 +53,60 @@ const cancelEdit = () => {
   editForm.value = profileStore.getProfileForm()
   isEditing.value = false
 }
-
-const {
-  avatarUrl,
-  uploading,
-  uploadError,
-  profile,
-  error
-} = storeToRefs(profileStore)
 </script>
 
 <template>
   <div class="max-w-3xl mx-auto py-8 px-4">
+    <!-- Ошибка -->
     <div v-if="error" class="text-center py-12">
       <p>{{ error }}</p>
-      <Button @click="profileStore.fetchProfile(true)" class="mt-4">
+      <Button @click="profileStore.fetchProfile" class="mt-4">
         Повторить
       </Button>
     </div>
 
+    <!-- Скелетон загрузки -->
+    <div v-else-if="loading" class="border rounded-lg p-6">
+      <div class="flex gap-8">
+        <!-- Аватар скелетон -->
+        <div class="w-28 h-28 md:w-48 md:h-48 flex-shrink-0">
+          <Skeleton class="w-full h-full rounded-lg" />
+        </div>
+
+        <!-- Информация скелетон -->
+        <div class="flex-1 space-y-4">
+          <div class="flex justify-between items-center mb-6">
+            <Skeleton class="h-7 w-24" />
+            <Skeleton class="h-8 w-20" />
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <Skeleton class="h-4 w-12 mb-2" />
+              <Skeleton class="h-10 w-full" />
+            </div>
+            <div>
+              <Skeleton class="h-4 w-12 mb-2" />
+              <Skeleton class="h-10 w-full" />
+            </div>
+            <div>
+              <Skeleton class="h-4 w-12 mb-2" />
+              <Skeleton class="h-10 w-full" />
+            </div>
+            <div>
+              <Skeleton class="h-4 w-12 mb-2" />
+              <Skeleton class="h-10 w-full" />
+            </div>
+            <div>
+              <Skeleton class="h-4 w-12 mb-2" />
+              <Skeleton class="h-10 w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Контент профиля -->
     <div v-else class="border rounded-lg p-6">
       <div class="flex gap-8">
         <div class="w-28 h-28 md:w-48 md:h-48 flex-shrink-0">
@@ -78,7 +114,7 @@ const {
             <div class="w-28 h-28 md:w-48 md:h-48 rounded-lg overflow-hidden border bg-muted">
               <img
                   :src="avatarUrl"
-                  :alt="profileStore.profile?.name || 'Avatar'"
+                  :alt="profile?.name || 'Avatar'"
                   class="w-full h-full object-cover"
               >
               <div
@@ -123,26 +159,24 @@ const {
             <div>
               <Label>Имя</Label>
               <div v-if="!isEditing" class="text-base">{{ profile?.name || '—' }}</div>
-              <input
+              <Input
                   v-else
                   v-model="editForm.name"
                   type="text"
                   placeholder="Имя"
-                  class="w-full px-3 py-2 border rounded-md"
-              >
+              />
             </div>
 
             <!-- Фамилия -->
             <div>
               <Label>Фамилия</Label>
               <div v-if="!isEditing" class="text-base">{{ profile?.lastName || '—' }}</div>
-              <input
+              <Input
                   v-else
                   v-model="editForm.lastName"
                   type="text"
                   placeholder="Фамилия"
-                  class="w-full px-3 py-2 border rounded-md"
-              >
+              />
             </div>
 
             <!-- Отчество -->
@@ -180,16 +214,12 @@ const {
                   placeholder="Логин"
               />
             </div>
+
             <div v-if="isEditing" class="flex justify-center items-center gap-4">
-              <Button
-                  @click="saveChanges"
-              >
+              <Button @click="saveChanges">
                 Сохранить
               </Button>
-              <Button
-                  variant="outline"
-                  @click="cancelEdit"
-              >
+              <Button variant="outline" @click="cancelEdit">
                 Отмена
               </Button>
             </div>

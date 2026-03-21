@@ -16,7 +16,8 @@ export interface Game {
     createdAt: string
     updatedAt: string | null,
     likesCount: number,
-    commentsCount: number
+    commentsCount: number,
+    isLiked: boolean,
 }
 
 export interface Stage {

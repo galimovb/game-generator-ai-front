@@ -117,7 +117,6 @@ const onScroll = () => {
 
 watch(() => props.open, async (val) => {
   if (val) {
-    await profileStore.fetchProfile()
     await loadComments(true)
   }
 })
@@ -193,10 +192,12 @@ watch(() => props.open, async (val) => {
 
                 <div :class="['rounded-md p-3 relative', isMyComment(comment) ? 'bg-muted text-muted-foreground' : 'border']">
                   <div v-if="comment.parentId" class="mb-2">
-                    <div class="text-sm text-muted-foreground bg-muted/30 rounded-lg py-1 px-2 border border-muted-foreground/20 relative">
-                      <div class="h-full bg-primary p-0.5 rounded-l-lg absolute top-0 left-0"/>
-                      <span class="font-medium">{{ getUserFullName(getParentComment(comment.parentId)?.author) }}</span>
-                      <p class="text-sm mt-1">{{ getParentComment(comment.parentId)?.text }}</p>
+                    <div class="flex items-center text-sm text-muted-foreground bg-muted/30 rounded-lg border border-muted-foreground/20 overflow-hidden">
+                      <div class="w-[4px] bg-primary self-stretch"></div>
+                      <div class="grid flex-1 py-1 px-2">
+                        <span class="font-medium">{{ getUserFullName(getParentComment(comment.parentId)?.author) }}</span>
+                        <p class="text-sm mt-1">{{ getParentComment(comment.parentId)?.text }}</p>
+                      </div>
                     </div>
                   </div>
                   <p class="text-sm break-words whitespace-pre-wrap">{{ comment.text }}</p>

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Heart, MessageCircle } from 'lucide-vue-next'
 
-withDefaults(defineProps<{
+const { post, del } = useApi()
+
+const props = withDefaults(defineProps<{
   game: Game
   showLikeButton: boolean
 }>(), {
@@ -11,15 +13,23 @@ withDefaults(defineProps<{
 
 const showComments = ref(false)
 
-const locationText = {
-  indoor: 'В помещении',
-  outdoor: 'На улице',
-  both: 'Оба варианта'
-}
-
 const openComments = (e: Event) => {
   e.stopPropagation()
   showComments.value = true
+}
+
+const toggleLike = async (e: Event) => {
+  try {
+    if (props.game.isLiked) {
+      await del(`/games/${props.game.id}/like`)
+      props.game.isLiked = false
+    } else {
+      await post(`/games/${props.game.id}/like`)
+      props.game.isLiked
+    }
+  } catch (e) {
+    console.error('Ошибка лайка', e)
+  }
 }
 </script>
 
@@ -48,7 +58,7 @@ const openComments = (e: Event) => {
 
       <CardTitle class="flex-1">{{ game.title || 'Без названия' }}</CardTitle>
 
-      <CardDescription class="line-clamp-2">
+      <CardDescription class="line-clamp-3">
         {{ game.description || 'Нет описания' }}
       </CardDescription>
     </CardHeader>
@@ -71,29 +81,39 @@ const openComments = (e: Event) => {
         <div class="flex justify-between items-center gap-4">
           <div class="flex items-center gap-2">
             <span class="text-muted-foreground">Локация:</span>
-            <span>{{ locationText[game.locationType] || '—' }}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <Button v-if="showLikeButton" variant="ghost" size="icon" class="p-1">
-              {{ game.likesCount }}
-              <Heart :size="16"/>
-            </Button>
-            <Button
-                variant="ghost"
-                size="icon"
-                class="p-1"
-                @click="openComments"
-            >
-              {{ game.commentsCount }}
-              <MessageCircle :size="16"/>
-            </Button>
+            <span>{{ gameLocationTypes[game.locationType] || '—' }}</span>
           </div>
         </div>
       </div>
     </CardContent>
+    <CardFooter class="justify-end gap-2">
+      <Button
+          v-if="showLikeButton"
+          variant="ghost"
+          size="icon"
+          class="p-1.5"
+          @click.stop="toggleLike"
+      >
+        {{ game.likesCount }}
+        <Heart
+            :size="16"
+            :class="{
+              'text-destructive': game.isLiked
+            }"
+        />
+      </Button>
+      <Button
+          variant="ghost"
+          size="icon"
+          class="p-1.5"
+          @click="openComments"
+      >
+        {{ game.commentsCount }}
+        <MessageCircle :size="16"/>
+      </Button>
+    </CardFooter>
   </Card>
 
-  <!-- Диалог комментариев -->
   <CommentsDialog
       v-model:open="showComments"
       :game-id="game.id"

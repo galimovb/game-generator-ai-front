@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { Home, Inbox, Headset, ChevronDown } from 'lucide-vue-next'
+import { Home, Inbox, Headset, ChevronDown, ChevronsUpDown, LogOut, UserPen  } from 'lucide-vue-next'
 
+const profileStore = useProfileStore()
+const { logout } = profileStore
+const { profile, avatarUrl } = storeToRefs(profileStore)
 const firstGroup = [
   {
     title: 'Главная',
@@ -42,7 +45,7 @@ const secondGroup = [
 <template>
   <Sidebar>
     <SidebarHeader class="flex-row justify-between">
-      Иконка
+      Лого
       <SidebarTrigger class="md:hidden"/>
     </SidebarHeader>
     <SidebarContent>
@@ -51,7 +54,7 @@ const secondGroup = [
           <SidebarMenu>
             <SidebarMenuItem v-for="item in firstGroup" :key="item.title">
               <SidebarMenuButton as-child>
-                <NuxtLink :to="item.url" active-class="bg-secondary">
+                <NuxtLink :to="item.url" active-class="bg-sidebar-accent">
                   <component :is="item.icon" />
                   <span>{{ item.title }}</span>
                 </NuxtLink>
@@ -77,7 +80,7 @@ const secondGroup = [
                   <SidebarMenuSub>
                     <SidebarMenuSubItem v-for="item in gamesGroup.items" :key="item.title">
                       <SidebarMenuSubButton as-child>
-                        <NuxtLink :to="item.url" active-class="bg-secondary">
+                        <NuxtLink :to="item.url" active-class="bg-sidebar-accent">
                           <span>{{ item.title }}</span>
                         </NuxtLink>
                       </SidebarMenuSubButton>
@@ -96,7 +99,7 @@ const secondGroup = [
             <SidebarMenuItem v-for="item in secondGroup" :key="item.title">
               <AppSettings/>
               <SidebarMenuButton as-child>
-                <NuxtLink :to="item.url" active-class="bg-secondary">
+                <NuxtLink :to="item.url" active-class="bg-sidebar-accent">
                   <component :is="item.icon" />
                   <span>{{ item.title }}</span>
                 </NuxtLink>
@@ -107,7 +110,34 @@ const secondGroup = [
       </SidebarGroup>
     </SidebarContent>
     <SidebarFooter>
-      карточка профиля
+      <DropdownMenu>
+        <DropdownMenuTrigger class="flex gap-2 items-center hover:bg-sidebar-accent rounded-md p-1">
+          <Avatar>
+            <AvatarImage :src="avatarUrl"/>
+            <AvatarFallback>
+              {{ profile?.name?.slice[0] }} {{ profile?.lastName?.slice[0] }}
+            </AvatarFallback>
+          </Avatar>
+          <div class="flex-1 grid text-sm text-left">
+            <span class="truncate font-medium">{{ profile?.name }} {{ profile?.lastName }}</span>
+            <span class="truncate">{{profile?.email}}</span>
+          </div>
+          <ChevronsUpDown :size="16"/>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" class="w-48">
+          <DropdownMenuItem as-child>
+            <NuxtLink to="/profile">
+              <UserPen/>
+              Профиль
+            </NuxtLink>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator/>
+          <DropdownMenuItem @click="logout">
+            <LogOut/>
+            Выйти
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </SidebarFooter>
   </Sidebar>
 </template>

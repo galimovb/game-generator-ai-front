@@ -184,10 +184,18 @@ const onClose = () => {
         <!-- Тип локации -->
         <div class="space-y-2">
           <Label>Тип локации</Label>
-          <Select v-model="form.locationType">
-            <option value="indoor">В помещении</option>
-            <option value="outdoor">На улице</option>
-            <option value="both">Оба варианта</option>
+          <Select v-model="form.locationType" :disabled="saving">
+            <SelectTrigger>
+              <SelectValue placeholder="Выберите тип" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem
+                  v-for="(value, key) in gameLocationTypes"
+                  :value="key"
+              >
+                {{value}}
+              </SelectItem>
+            </SelectContent>
           </Select>
         </div>
 

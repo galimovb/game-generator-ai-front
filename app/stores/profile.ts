@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
 
 export const useProfileStore = defineStore('profile', () => {
-    const { get, patch } = useApi()
+    const { get, patch, post } = useApi()
     const profile = ref(null)
-    const loading = ref(false)
-    const error = ref(null)
-    const uploading = ref(false)
-    const uploadError = ref(null)
-    const avatarPreview = ref(null)
+    const loading = ref<boolean>(false)
+    const error = ref<string | null>(null)
+    const uploading = ref<boolean>(false)
+    const uploadError = ref<string | null>(null)
+    const avatarPreview = ref<string | null>(null)
 
     const avatarUrl = computed(() => {
         if (avatarPreview.value) return avatarPreview.value
@@ -21,13 +21,9 @@ export const useProfileStore = defineStore('profile', () => {
         return getUserFullName(profile.value) || '-'
     })
 
-    async function fetchProfile(force = false) {
-        if (!force && profile.value) return
-
-        loading.value = true
-        error.value = null
-
+    async function fetchProfile() {
         try {
+            loading.value = true
             const response = await get('/users/profile')
             profile.value = response.result
         } catch (err) {
@@ -37,7 +33,7 @@ export const useProfileStore = defineStore('profile', () => {
         }
     }
 
-    async function updateProfile(data) {
+    async function updateProfile(data: UserU) {
         loading.value = true
         error.value = null
 
@@ -47,7 +43,6 @@ export const useProfileStore = defineStore('profile', () => {
             if (data.avatar) {
                 avatarPreview.value = null
             }
-            return response.result
         } catch (err) {
             error.value = err.data?.message || 'Ошибка обновления профиля'
             throw err
@@ -117,6 +112,16 @@ export const useProfileStore = defineStore('profile', () => {
         }
     }
 
+    async function logout () {
+        try {
+            await post('/auth/logout')
+            navigateTo('/login')
+            profile.value = null
+        } catch (e) {
+            console.error('Ошибка выхода', e)
+        }
+    }
+
     return {
         profile,
         loading,
@@ -130,5 +135,6 @@ export const useProfileStore = defineStore('profile', () => {
         updateProfile,
         uploadAvatar,
         getProfileForm,
+        logout
     }
 })
