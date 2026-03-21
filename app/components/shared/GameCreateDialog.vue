@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Camera } from 'lucide-vue-next'
 
-const props = defineProps<{
+defineProps<{
   open: boolean
 }>()
 

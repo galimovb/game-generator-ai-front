@@ -1,11 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
-import type { Game } from '~/types/game'
-import type { UserProfile } from '~/types/user'
 import { Plus, Check, X, Loader, Pencil, Trash2 } from 'lucide-vue-next'
 import { toast } from "vue-sonner"
-import {getPhotoUrl} from "../../lib/helpers";
 
 const route = useRoute()
 const { get, patch, del } = useApi()

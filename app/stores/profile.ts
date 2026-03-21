@@ -1,6 +1,4 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import {getPhotoUrl, getUserFullName} from "../lib/helpers";
 
 export const useProfileStore = defineStore('profile', () => {
     const { get, patch } = useApi()

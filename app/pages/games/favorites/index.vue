@@ -9,7 +9,7 @@ const limit = ref<number>(20)
 const { data: gamesResponse, pending } = await useAsyncData<{ result: { items: Game[], pagination: { total: number } } }>(
     'games-list',
     async (): Promise<{ result: { items: Game[], pagination: { total: number } } }> => {
-      return await get('/games', {
+      return await get('/games/favorite', {
         query: { page: page.value, limit: limit.value }
       })
     },
@@ -30,22 +30,6 @@ const loading = computed<boolean>(() => pending.value)
     <!-- Заголовок -->
     <div class="flex justify-between items-center gap-4">
       <h1 class="text-lg md:text-xl lg:text-3xl font-semibold tracking-tight">Список игр</h1>
-      <Tabs v-model="currentTab">
-        <TabsList>
-          <TabsTrigger
-              v-for="tab in tabsSettings"
-              :value="tab.value"
-              :disabled="loading"
-              class="gap-2"
-          >
-            <component
-                :is="tab.icon"
-                :size="16"
-            />
-            {{ tab.label }}
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
     </div>
 
     <!-- Список игр -->
@@ -54,7 +38,7 @@ const loading = computed<boolean>(() => pending.value)
     </div>
 
     <div v-else-if="games.length === 0" class="text-center py-12">
-      <p class="text-muted-foreground">Пока никто не выложил игру в общий доступ</p>
+      <p class="text-muted-foreground"> У вас пока нет избранных игр</p>
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -1,19 +1,13 @@
 <script setup lang="ts">
-import type { Game } from '~/types/game'
 import { Heart, MessageCircle } from 'lucide-vue-next'
-import CommentsDialog from './CommentsDialog.vue'
-import {getPhotoUrl} from "../../lib/helpers";
 
-const props = defineProps<{
+withDefaults(defineProps<{
   game: Game
-  showActions?: boolean
-}>()
-
-const emit = defineEmits<{
-  (e: 'click'): void
-  (e: 'edit', game: Game): void
-  (e: 'delete', game: Game): void
-}>()
+  showLikeButton: boolean
+}>(), {
+  game: {},
+  showLikeButton: true
+})
 
 const showComments = ref(false)
 
@@ -32,7 +26,7 @@ const openComments = (e: Event) => {
 <template>
   <Card
       class="cursor-pointer hover:shadow-lg transition-shadow relative group"
-      @click="$emit('click')"
+      @click="goToGame(game.id)"
   >
     <CardHeader>
       <!-- Фото -->
@@ -80,7 +74,7 @@ const openComments = (e: Event) => {
             <span>{{ locationText[game.locationType] || '—' }}</span>
           </div>
           <div class="flex items-center gap-2">
-            <Button variant="ghost" size="icon" class="p-1">
+            <Button v-if="showLikeButton" variant="ghost" size="icon" class="p-1">
               {{ game.likesCount }}
               <Heart :size="16"/>
             </Button>

@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import { reactive, ref, watch, computed } from 'vue'
 import { Send, Loader, MessageCircle, Reply, X, MoreVertical, Trash2 } from 'lucide-vue-next'
 import { toast } from "vue-sonner"
-import type { GameComment } from '~/types/comment'
-import { formatDate, getPhotoUrl, getUserFullName } from "../../lib/helpers"
-import { useProfileStore } from '~/stores/profile'
 
 const props = defineProps<{
   gameId: number

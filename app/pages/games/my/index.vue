@@ -1,15 +1,10 @@
 <script setup lang="ts">
 import { Plus, Loader } from 'lucide-vue-next'
-import type { Game } from '~/types/game'
-import GameCard from "~/components/games/GameCard.vue"
-import GameCreateDialog from "~/components/games/GameCreateDialog.vue";
-import {goToGame} from "../../../lib/helpers";
 
-const { get, del } = useApi()
+const { get } = useApi()
 
 const page = ref(1)
 const limit = ref(20)
-const deletingId = ref<number | null>(null)
 const showCreateDialog = ref(false)
 
 const { data: gamesResponse, pending, refresh } = await useAsyncData<{ result: { items: Game[], pagination: { total: number } } }>(
@@ -36,20 +31,6 @@ const loading = computed(() => pending.value)
 
 const loadGames = async () => {
   await refresh()
-}
-
-const deleteGame = async (game: Game) => {
-  if (!confirm(`Удалить игру "${game.title}"?`)) return
-
-  deletingId.value = game.id
-  try {
-    await del(`/games/${game.id}`)
-    await refresh()
-  } catch (error) {
-    console.error('Ошибка удаления игры:', error)
-  } finally {
-    deletingId.value = null
-  }
 }
 </script>
 
@@ -79,8 +60,6 @@ const deleteGame = async (game: Game) => {
           :key="game.id"
           :game="game"
           :show-actions="true"
-          @click="goToGame(game.id)"
-          @delete="deleteGame"
       />
     </div>
 

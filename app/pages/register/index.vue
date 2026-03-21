@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { reactive, ref, computed, watch } from 'vue'
-import type { UserRegister } from "../../types/user";
 import { Loader } from 'lucide-vue-next'
+
+definePageMeta({
+  layout: 'auth'
+})
 
 const { post } = useApi()
 const router = useRouter()
@@ -149,7 +151,7 @@ watch([() => registerData.email, () => registerData.password, () => registerData
 
       <!-- Ссылка на логин -->
       <CardFooter class="justify-center pb-6">
-        <p class="text-sm text-gray-500">
+        <p class="text-sm text-muted-foreground">
           Уже есть аккаунт?
           <Button variant="link" class="px-0">
             <NuxtLink

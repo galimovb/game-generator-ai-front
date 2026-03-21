@@ -1,47 +1,49 @@
 <script setup lang="ts">
-import { Calendar, Home, Inbox, Headset, Settings, Heart } from 'lucide-vue-next'
+import { Home, Inbox, Headset, ChevronDown } from 'lucide-vue-next'
 
 const firstGroup = [
   {
     title: 'Главная',
     url: '/',
     icon: Home,
-  },
-  {
-    title: 'Мои игры',
-    url: '/games/my',
-    icon: Inbox,
-  },
-  {
-    title: 'Публичные игры',
-    url: '/games',
-    icon: Calendar,
-  },
-  {
-    title: 'Избранные игры',
-    url: '/games',
-    icon: Heart,
-  },
+  }
 ]
+
+const gamesGroup = {
+  title: 'Игры',
+  icon: Inbox,
+  items: [
+    {
+      title: 'Мои',
+      url: '/games/my',
+    },
+    {
+      title: 'Публичные',
+      url: '/games',
+    },
+    {
+      title: 'Избранные',
+      url: '/games/favorites',
+    }
+  ]
+}
 
 const secondGroup = [
   {
     title: 'Поддержка',
     url: '/support',
     icon: Headset,
-  },
-  {
-    title: 'Настройки',
-    url: '/settings',
-    icon: Settings,
-  },
+  }
 ]
+
+
 </script>
 
 <template>
   <Sidebar>
-    <SidebarHeader>
+    <SidebarHeader class="flex-row justify-between">
       Иконка
+      <SidebarTrigger class="md:hidden"/>
     </SidebarHeader>
     <SidebarContent>
       <SidebarGroup>
@@ -49,7 +51,7 @@ const secondGroup = [
           <SidebarMenu>
             <SidebarMenuItem v-for="item in firstGroup" :key="item.title">
               <SidebarMenuButton as-child>
-                <NuxtLink :to="item.url">
+                <NuxtLink :to="item.url" active-class="bg-secondary">
                   <component :is="item.icon" />
                   <span>{{ item.title }}</span>
                 </NuxtLink>
@@ -58,12 +60,43 @@ const secondGroup = [
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
+
+      <SidebarGroup>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <Collapsible default-open>
+                <CollapsibleTrigger as-child>
+                  <SidebarMenuButton>
+                    <component :is="gamesGroup.icon" />
+                    <span>{{ gamesGroup.title }}</span>
+                    <ChevronDown class="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    <SidebarMenuSubItem v-for="item in gamesGroup.items" :key="item.title">
+                      <SidebarMenuSubButton as-child>
+                        <NuxtLink :to="item.url" active-class="bg-secondary">
+                          <span>{{ item.title }}</span>
+                        </NuxtLink>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </Collapsible>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+
       <SidebarGroup class="mt-auto">
         <SidebarGroupContent>
           <SidebarMenu>
             <SidebarMenuItem v-for="item in secondGroup" :key="item.title">
+              <AppSettings/>
               <SidebarMenuButton as-child>
-                <NuxtLink :to="item.url">
+                <NuxtLink :to="item.url" active-class="bg-secondary">
                   <component :is="item.icon" />
                   <span>{{ item.title }}</span>
                 </NuxtLink>
@@ -74,7 +107,7 @@ const secondGroup = [
       </SidebarGroup>
     </SidebarContent>
     <SidebarFooter>
-      тест
+      карточка профиля
     </SidebarFooter>
   </Sidebar>
 </template>

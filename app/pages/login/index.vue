@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import {reactive, ref} from 'vue'
 import {UserLogin} from "../../types/user";
 import { Loader } from 'lucide-vue-next'
+
+definePageMeta({
+  layout: 'auth'
+})
+
 const { post } = useApi()
 
 const loginData = reactive<UserLogin>({
@@ -81,12 +85,26 @@ const handleSubmit = async () => {
           </Button>
         </form>
       </CardContent>
-      <div class="px-6 pb-2 text-center">или</div>
       <CardFooter class="flex flex-col gap-2">
+        <p class="text-sm text-muted-foreground">
+          Нет аккаунта?
+          <Button variant="link" class="px-0">
+            <NuxtLink
+                to="/register"
+            >
+              Регистрация
+            </NuxtLink>
+          </Button>
+        </p>
+        <div class="px-6 pb-2 text-center">или</div>
         <Button variant="outline" class="w-full">
           Войти через
           <img src="~/assets/img/yandex-icon.png" class="w-5 h-5">
         </Button>
+      </CardFooter>
+
+      <CardFooter class="justify-center pb-6">
+
       </CardFooter>
     </Card>
   </div>
