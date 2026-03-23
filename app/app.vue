@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 const { fontSize, radius, color, isDarkTheme } = storeToRefs(useAppData())
 useHead({
   htmlAttrs: {
@@ -10,8 +11,10 @@ useHead({
 })
 
 const profileStore = useProfileStore()
+const settingsStore = useSettingsStore()
 
-profileStore.fetchProfile()
+await profileStore.fetchProfile()
+await settingsStore.fetchSettings()
 </script>
 
 <template>

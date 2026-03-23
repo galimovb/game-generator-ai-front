@@ -1,12 +1,40 @@
 <script setup lang="ts">
 import { Settings, Moon, Sun } from 'lucide-vue-next'
-
-const open = ref<boolean>(false)
-const creativity = ref([0.7])
+import { watchDebounced } from "@vueuse/core";
+import {ModelType} from "@/types/enums";
 
 const appData = useAppData()
+const { states, updateSettings } = useSettingsStore()
 const { fontSize, radius, color, isDarkTheme } = storeToRefs(appData)
 const { setTheme, setFont, setRadius, setColor, availableColors, availableFontSize, availableRadius } = appData
+
+const open = ref<boolean>(false)
+const creativityValue = ref<number>([states.settings.generationCreative])
+const modelValue = ref<ModelType>(states.settings.generationModel)
+
+//TODO - фикс на получение с апи
+const modelTypes = [
+  { value: 'qwen/qwen2.5-vl-7b-instruct', label: 'Qwen2.5-VL 7B (Быстрая)' },
+  { value: 'qwen/qwen3-vl-8b-instruct', label: 'Qwen3-VL 8B (Сбалансированная)'  },
+  { value: 'qwen/qwen3-vl-8b-thinking', label: 'Qwen3-VL 8B Thinking (Качественная)' }
+]
+
+// Синхронизация из стора
+watch(() => states.settings.generationCreative, (val) => {
+  creativityValue.value = [val]
+})
+
+watch(() => states.settings.generationModel, (val) => {
+  modelValue.value = val
+})
+
+// Дебаунс сохранения обоих параметров
+watchDebounced([creativityValue, modelValue], async ([creativity, model]) => {
+  await updateSettings({
+    generationCreative: creativity[0],
+    generationModel: model
+  })
+}, { debounce: 200 })
 </script>
 
 <template>
@@ -24,14 +52,12 @@ const { setTheme, setFont, setRadius, setColor, availableColors, availableFontSi
           <AccordionContent class="space-y-4 px-0.5">
             <div class="space-y-2">
               <h5 class="text-sm font-medium leading-none">Модель</h5>
-              <Select>
+              <Select v-model="modelValue">
                 <SelectTrigger>
                   <SelectValue placeholder="Выберите модель" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="fast">Qwen2.5-VL 7B (Быстрая)</SelectItem>
-                  <SelectItem value="balanced">Qwen3-VL 8B (Сбалансированная)</SelectItem>
-                  <SelectItem value="quality">Qwen3-VL 8B Thinking (Качественная)</SelectItem>
+                  <SelectItem v-for="model in modelTypes" :value="model.value">{{model.label}}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -39,13 +65,13 @@ const { setTheme, setFont, setRadius, setColor, availableColors, availableFontSi
             <div class="space-y-2">
               <div class="flex justify-between">
                 <h5 class="text-sm font-medium leading-none">Креативность</h5>
-                <span class="text-sm text-muted-foreground">{{ Math.round(creativity[0] * 100) }}%</span>
+                <span class="text-sm text-muted-foreground">{{ Math.round(creativityValue[0] * 100) }}%</span>
               </div>
-              <Slider v-model="creativity" :min="0" :max="1" :step="0.01" />
+              <Slider v-model="creativityValue" :min="0" :max="1" :step="0.05" />
               <div class="flex justify-between text-xs text-muted-foreground">
-                <span>Предсказуемая</span>
-                <span>Сбалансированная</span>
-                <span>Неожиданная</span>
+                <span> Предсказуемая </span>
+                <span> Сбалансированная </span>
+                <span> Неожиданная </span>
               </div>
             </div>
           </AccordionContent>
