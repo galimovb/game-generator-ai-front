@@ -31,6 +31,8 @@ const newRequisite = ref('')
 const photoPreviews = ref<string[]>([])
 const uploadError = ref('')
 
+const isCreating = ref(false)
+
 // Добавление реквизита
 const addRequisite = () => {
   if (newRequisite.value.trim()) {
@@ -80,12 +82,15 @@ const removePhoto = (index: number) => {
 // Создание игры
 const createGame = async () => {
   try {
+    isCreating.value = true
     await post('/games/generate', form.value)
     emit('created')
     resetForm()
     emit('update:open', false)
   } catch (error) {
     console.error('Ошибка создания игры:', error)
+  } finally {
+    isCreating.value = false
   }
 }
 
@@ -115,7 +120,7 @@ const onClose = () => {
 
 <template>
   <Dialog :open="open" @update:open="onClose">
-    <DialogContent class="max-w-2xl max-h-[90vh] overflow-y-auto">
+    <DialogContent class="max-w-2xl max-h-[90vh] overflow-y-auto" :disable-outside-pointer-events="isCreating">
       <DialogHeader>
         <DialogTitle>Создание новой игры</DialogTitle>
         <DialogDescription>
@@ -239,8 +244,8 @@ const onClose = () => {
       </div>
 
       <DialogFooter>
-        <Button variant="outline" @click="onClose">Отмена</Button>
-        <Button @click="createGame">Создать</Button>
+        <Button variant="outline" :disabled="isCreating" @click="onClose">Отмена</Button>
+        <Button @click="createGame" :disabled="isCreating">Создать</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>

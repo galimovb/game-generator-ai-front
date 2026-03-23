@@ -13,19 +13,16 @@ const props = withDefaults(defineProps<{
 
 const showComments = ref(false)
 
-const openComments = (e: Event) => {
-  e.stopPropagation()
+const openComments = () => {
   showComments.value = true
 }
 
-const toggleLike = async (e: Event) => {
+const toggleLike = async () => {
   try {
     if (props.game.isLiked) {
       await del(`/games/${props.game.id}/like`)
-      props.game.isLiked = false
     } else {
       await post(`/games/${props.game.id}/like`)
-      props.game.isLiked
     }
   } catch (e) {
     console.error('Ошибка лайка', e)
@@ -86,30 +83,35 @@ const toggleLike = async (e: Event) => {
         </div>
       </div>
     </CardContent>
-    <CardFooter class="justify-end gap-2">
-      <Button
-          v-if="showLikeButton"
-          variant="ghost"
-          size="icon"
-          class="p-1.5"
-          @click.stop="toggleLike"
-      >
-        {{ game.likesCount }}
-        <Heart
-            :size="16"
-            :class="{
+    <CardFooter class="justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <Button
+            v-if="showLikeButton"
+            variant="ghost"
+            size="icon"
+            class="p-1.5"
+            @click.stop="toggleLike"
+        >
+          {{ game.likesCount }}
+          <Heart
+              :size="16"
+              :class="{
               'text-destructive': game.isLiked
             }"
-        />
-      </Button>
-      <Button
-          variant="ghost"
-          size="icon"
-          class="p-1.5"
-          @click="openComments"
-      >
-        {{ game.commentsCount }}
-        <MessageCircle :size="16"/>
+          />
+        </Button>
+        <Button
+            variant="ghost"
+            size="icon"
+            class="p-1.5"
+            @click.stop="openComments"
+        >
+          {{ game.commentsCount }}
+          <MessageCircle :size="16"/>
+        </Button>
+      </div>
+      <Button variant="ghost" class="rounded-full w-8 h-8">
+        <User :show-name="false" :user="game.author" :size="8"/>
       </Button>
     </CardFooter>
   </Card>

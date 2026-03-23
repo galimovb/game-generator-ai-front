@@ -8,6 +8,17 @@ export const useAppData = defineStore('appData', () => {
 
     const isDarkTheme = computed(() => theme.value === 'dark')
 
+    const availableColors = [
+        { value: 'gray', description: 'Серый' },
+        { value: 'zinc', description: 'Цинк' },
+        { value: 'rose', description: 'Розовый' },
+        { value: 'blue', description: 'Синий' },
+        { value: 'green', description: 'Зеленый' },
+        { value: 'orange', description: 'Оранжевый' },
+        { value: 'purple', description: 'Фиолетовый' },
+        { value: 'sky', description: 'Небесный' }
+    ]
+
     const availableFontSize = ['13', '14', '15', '16', '17', '18', '19', '20']
     const availableRadius = ['0', '0.25', '0.5', '0.75', '1']
 
@@ -28,7 +39,8 @@ export const useAppData = defineStore('appData', () => {
     }
 
     function setColor(value: string) {
-        if (value in availableColors) {
+        const colorExists = availableColors.some(c => c.value === value)
+        if (colorExists) {
             color.value = value
         }
     }
@@ -68,6 +80,7 @@ export const useAppData = defineStore('appData', () => {
         isDarkTheme,
         availableFontSize,
         availableRadius,
+        availableColors,
         setTheme,
         setFont,
         setRadius,

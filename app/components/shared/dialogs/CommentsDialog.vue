@@ -150,10 +150,7 @@ watch(() => props.open, async (val) => {
         <div v-else v-for="comment in state.comments" :key="comment.id">
           <div :class="['flex', isMyComment(comment) ? 'justify-end' : '']">
             <div class="flex gap-2 max-w-[85%] items-end">
-              <Avatar v-if="!isMyComment(comment)" class="h-8 w-8 flex-shrink-0">
-                <AvatarImage :src="getPhotoUrl(comment.author?.avatar)" />
-                <AvatarFallback>{{ comment.author?.name?.charAt(0) || '?' }}</AvatarFallback>
-              </Avatar>
+              <User v-if="!isMyComment(comment)" :show-name="false" :user="comment.author" :size="8"/>
 
               <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between gap-2 mb-1">
@@ -207,10 +204,7 @@ watch(() => props.open, async (val) => {
                 </div>
               </div>
 
-              <Avatar v-if="isMyComment(comment)" class="h-8 w-8 flex-shrink-0">
-                <AvatarImage :src="getPhotoUrl(comment.author?.avatar)" />
-                <AvatarFallback>{{ comment.author?.name?.charAt(0)}}</AvatarFallback>
-              </Avatar>
+              <User v-if="isMyComment(comment)" :show-name="false" :user="comment.author" :size="8"/>
             </div>
           </div>
         </div>

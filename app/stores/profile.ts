@@ -1,49 +1,47 @@
 import { defineStore } from 'pinia'
+import type { UserProfile } from '~/types/user'
 
 export const useProfileStore = defineStore('profile', () => {
-    const { get, patch, post } = useApi()
-    const profile = ref(null)
-    const loading = ref<boolean>(false)
+    const { get, patch } = useApi()
+
+    const profile = ref<UserProfile | null>(null)
+    const loading = ref(false)
     const error = ref<string | null>(null)
-    const uploading = ref<boolean>(false)
-    const uploadError = ref<string | null>(null)
-    const avatarPreview = ref<string | null>(null)
+    const uploading = ref(false)
 
     const avatarUrl = computed(() => {
-        if (avatarPreview.value) return avatarPreview.value
         if (!profile.value?.avatar) {
             return 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'
         }
-        return `${getPhotoUrl(profile.value.avatar)}`
+        return getPhotoUrl(profile.value.avatar)
     })
 
     const fullName = computed(() => {
-        return getUserFullName(profile.value) || '-'
+        return getUserFullName(profile.value)
     })
 
     async function fetchProfile() {
+        loading.value = true
+        error.value = null
+
         try {
-            loading.value = true
             const response = await get('/users/profile')
             profile.value = response.result
-        } catch (err) {
+        } catch (err: any) {
             error.value = err.data?.message || 'Ошибка загрузки профиля'
         } finally {
             loading.value = false
         }
     }
 
-    async function updateProfile(data: UserU) {
+    async function updateProfile(data: Partial<UserProfile>) {
         loading.value = true
         error.value = null
 
         try {
             const response = await patch('/users/profile', data)
             profile.value = response.result
-            if (data.avatar) {
-                avatarPreview.value = null
-            }
-        } catch (err) {
+        } catch (err: any) {
             error.value = err.data?.message || 'Ошибка обновления профиля'
             throw err
         } finally {
@@ -51,72 +49,41 @@ export const useProfileStore = defineStore('profile', () => {
         }
     }
 
-    async function uploadAvatar(file) {
+    async function uploadAvatar(file: File) {
         if (!file.type.startsWith('image/')) {
-            uploadError.value = 'Можно загружать только изображения'
-            return false
+            throw new Error('Можно загружать только изображения')
         }
 
         if (file.size > 5 * 1024 * 1024) {
-            uploadError.value = 'Размер файла не должен превышать 5MB'
-            return false
+            throw new Error('Размер файла не должен превышать 5MB')
         }
 
         return new Promise((resolve, reject) => {
             const reader = new FileReader()
 
             reader.onload = async (e) => {
-                const base64 = e.target?.result
-                avatarPreview.value = base64
                 uploading.value = true
-                uploadError.value = null
-
                 try {
-                    await updateProfile({ avatar: base64 })
+                    await updateProfile({ avatar: e.target?.result as string })
                     resolve(true)
                 } catch (err) {
-                    uploadError.value = 'Ошибка при загрузке аватара'
-                    avatarPreview.value = null
                     reject(err)
                 } finally {
                     uploading.value = false
                 }
             }
 
-            reader.onerror = () => {
-                uploadError.value = 'Ошибка чтения файла'
-                reject(new Error('File read error'))
-            }
-
+            reader.onerror = () => reject(new Error('Ошибка чтения файла'))
             reader.readAsDataURL(file)
         })
     }
 
-    function getProfileForm() {
-        if (!profile.value) {
-            return {
-                name: '',
-                lastName: '',
-                middleName: '',
-                email: '',
-                login: ''
-            }
-        }
-
-        return {
-            name: profile.value.name || '',
-            lastName: profile.value.lastName || '',
-            middleName: profile.value.middleName || '',
-            email: profile.value.email || '',
-            login: profile.value.login || ''
-        }
-    }
-
-    async function logout () {
+    async function logout() {
+        const { post } = useApi()
         try {
             await post('/auth/logout')
-            navigateTo('/login')
             profile.value = null
+            navigateTo('/login')
         } catch (e) {
             console.error('Ошибка выхода', e)
         }
@@ -127,14 +94,11 @@ export const useProfileStore = defineStore('profile', () => {
         loading,
         error,
         uploading,
-        uploadError,
-        avatarPreview,
         avatarUrl,
         fullName,
         fetchProfile,
         updateProfile,
         uploadAvatar,
-        getProfileForm,
         logout
     }
 })

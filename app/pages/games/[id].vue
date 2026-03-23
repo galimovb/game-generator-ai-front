@@ -411,13 +411,7 @@ onMounted(async () => {
             </div>
 
             <div v-else class="flex items-center gap-2" title="Автор">
-              {{ game.author?.name }}
-              <Avatar class="h-7 w-7 md:h-9 md:w-9">
-                <AvatarImage :src="getPhotoUrl(game.author.avatar)"/>
-                <AvatarFallback>
-                  {{ game.author?.name[0] }}
-                </AvatarFallback>
-              </Avatar>
+              <User name-position="left" :user="game.author" :size="9" name-field="email"/>
             </div>
           </div>
         </CardHeader>

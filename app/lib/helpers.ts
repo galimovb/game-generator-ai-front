@@ -3,7 +3,7 @@ export const getPhotoUrl = (path: string):string => {
     return `${config.public.apiBase}${path}`
 }
 
-export const getUserFullName = (author: UserProfile):string => {
+export const getUserFullName = (author?: UserProfile | undefined):string => {
     if (!author) return ''
     const parts = [author.lastName, author.name].filter(Boolean)
     return parts.length ? parts.join(' ') : author.email

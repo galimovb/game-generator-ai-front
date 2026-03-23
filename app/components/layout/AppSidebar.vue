@@ -112,12 +112,7 @@ const secondGroup = [
     <SidebarFooter>
       <DropdownMenu>
         <DropdownMenuTrigger class="flex gap-2 items-center hover:bg-sidebar-accent rounded-md p-1">
-          <Avatar>
-            <AvatarImage :src="avatarUrl"/>
-            <AvatarFallback>
-              {{ profile?.name?.slice[0] }} {{ profile?.lastName?.slice[0] }}
-            </AvatarFallback>
-          </Avatar>
+          <User :show-name="false" :user="profile" :size="9"/>
           <div class="flex-1 grid text-sm text-left">
             <span class="truncate font-medium">{{ profile?.name }} {{ profile?.lastName }}</span>
             <span class="truncate">{{profile?.email}}</span>

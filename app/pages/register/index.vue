@@ -24,8 +24,7 @@ const error = ref('')
 // Валидация
 const isFormValid = computed(() => {
   return registerData.email.includes('@') &&
-      registerData.password.length >= 6 &&
-      registerData.login.length >= 3
+      registerData.password.length >= 6
 })
 
 const handleSubmit = async () => {
@@ -86,7 +85,6 @@ watch([() => registerData.email, () => registerData.password, () => registerData
                 v-model="registerData.login"
                 type="text"
                 placeholder="ivan123"
-                required
             />
           </div>
 
