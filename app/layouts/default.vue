@@ -1,5 +1,13 @@
 <script setup lang="ts">
 import { Menu } from 'lucide-vue-next'
+
+const profileStore = useProfileStore()
+const settingsStore = useSettingsStore()
+
+await Promise.all([
+  profileStore.fetchProfile(),
+  settingsStore.fetchSettings()
+])
 </script>
 
 <template>
@@ -8,7 +16,7 @@ import { Menu } from 'lucide-vue-next'
     <SidebarInset>
       <header class="bg-muted border-b shadow-lg md:hidden sticky top-0 left-0 px-2 py-1">
         <div class="flex items-center justify-between">
-          <span>Лого</span>
+          <AppIcon/>
           <SidebarTrigger :icon="Menu"/>
         </div>
       </header>

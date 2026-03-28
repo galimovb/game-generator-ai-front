@@ -27,6 +27,8 @@ const handleSubmit = async () => {
     await navigateTo('/')
   } catch (err) {
     error.value = err.data?.message || 'Ошибка при входе'
+  } finally {
+    loading.value = false
   }
 }
 </script>
@@ -41,7 +43,7 @@ const handleSubmit = async () => {
         <form @submit.prevent="handleSubmit">
           <div class="grid w-full items-center gap-4">
             <div class="flex flex-col space-y-1.5">
-              <Label for="email">Email</Label>
+              <Label for="email">Почта</Label>
               <Input
                   id="email"
                   v-model="loginData.email"
@@ -52,7 +54,7 @@ const handleSubmit = async () => {
             </div>
             <div class="flex flex-col space-y-1.5">
               <div class="flex items-center">
-                <Label for="password">Password</Label>
+                <Label for="password">Пароль</Label>
                 <a
                     href="#"
                     class="ml-auto inline-block text-sm underline"
@@ -85,6 +87,11 @@ const handleSubmit = async () => {
         </form>
       </CardContent>
       <CardFooter class="flex flex-col gap-2">
+        <div class="px-6 pb-2 text-center">или</div>
+        <Button variant="outline" class="w-full">
+          Войти через
+          <img src="~/assets/img/yandex-icon.png" class="w-5 h-5">
+        </Button>
         <p class="text-sm text-muted-foreground">
           Нет аккаунта?
           <Button variant="link" class="px-0">
@@ -95,15 +102,6 @@ const handleSubmit = async () => {
             </NuxtLink>
           </Button>
         </p>
-        <div class="px-6 pb-2 text-center">или</div>
-        <Button variant="outline" class="w-full">
-          Войти через
-          <img src="~/assets/img/yandex-icon.png" class="w-5 h-5">
-        </Button>
-      </CardFooter>
-
-      <CardFooter class="justify-center pb-6">
-
       </CardFooter>
     </Card>
   </div>

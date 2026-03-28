@@ -5,9 +5,11 @@ import { toast } from "vue-sonner"
 const route = useRoute()
 const { get, patch, del } = useApi()
 
+const profileStore = useProfileStore()
+const { profile } = storeToRefs(profileStore)
+
 // Состояния
 const game = ref<Game | null>(null)
-const profile = ref<UserProfile | null>(null)
 const loading = ref(true)
 const saving = ref(false)
 const error = ref('')
@@ -63,9 +65,6 @@ const loadData = async () => {
 
     const gameResponse = await get(`/games/${gameId}`)
     game.value = gameResponse.result
-
-    const profileResponse = await get('/users/profile')
-    profile.value = profileResponse.result
 
     isAuthor.value = profile.value?.id === game.value?.author.id
 
@@ -186,7 +185,7 @@ const saveStageChanges = async (stageId: number) => {
 
   savingStageId.value = stageId
   try {
-    const response = await patch(`/stages/${stageId}`, stageForms.value[stageId])
+    const response = await patch(`/games/${game.value.id}/stages/${stageId}`, stageForms.value[stageId])
     // Обновляем данные в game
     const stageIndex = game.value.stages.findIndex(s => s.id === stageId)
     if (stageIndex !== -1) {
@@ -206,7 +205,7 @@ const saveStageChanges = async (stageId: number) => {
 const deleteStage = async (stageId: number) => {
   deletingStageId.value = stageId
   try {
-    await del(`/stages/${stageId}`)
+    await del(`/games/${game.value.id}/stages/${stageId}`)
     if (game.value) {
       game.value.stages = game.value.stages.filter(s => s.id !== stageId)
     }

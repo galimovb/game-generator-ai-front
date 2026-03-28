@@ -44,8 +44,8 @@ const secondGroup = [
 
 <template>
   <Sidebar>
-    <SidebarHeader class="flex-row justify-between">
-      Лого
+    <SidebarHeader class="flex-row justify-between py-3 px-2">
+      <AppIcon/>
       <SidebarTrigger class="md:hidden"/>
     </SidebarHeader>
     <SidebarContent>

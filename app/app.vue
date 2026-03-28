@@ -9,12 +9,6 @@ useHead({
     'data-font': fontSize.value
   }
 })
-
-const profileStore = useProfileStore()
-const settingsStore = useSettingsStore()
-
-await profileStore.fetchProfile()
-await settingsStore.fetchSettings()
 </script>
 
 <template>

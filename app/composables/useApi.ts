@@ -2,34 +2,44 @@ import { sendRedirect } from 'h3'
 
 export const useApi = () => {
   const { $api } = useNuxtApp()
+  let isRefreshing = false
+  let refreshPromise: Promise<any> | null = null
 
   const fetchWithAuth = async (url: string, options: any = {}, currentUrl?: string) => {
     const event = import.meta.server ? useRequestEvent() : null
 
+    const makeRequest = () => $api(url, options)
+
     try {
-      return await $api(url, options)
+      return await makeRequest()
     } catch (err: any) {
       if (err?.response?.status !== 401) throw err
       if (url.includes('/auth/refresh')) throw err
 
-      try {
-        await $api('/auth/refresh', {
-          method: 'POST'
-        })
+      if (!isRefreshing) {
+        isRefreshing = true
+        refreshPromise = $api('/auth/refresh', { method: 'POST' })
+            .catch((e) => {
+              if (import.meta.server && event) {
+                return sendRedirect(event, '/login', 302)
+              } else {
+                return navigateTo('/login')
+              }
+              throw e
+            })
+            .finally(() => {
+              isRefreshing = false
+              refreshPromise = null
+            })
+      }
 
-        if (import.meta.client) {
-          return await $api(url, options)
-        } else {
-          await sendRedirect(event, currentUrl || '/login', 302)
-          return
-        }
-      } catch (e) {
-        if (import.meta.server && event) {
-          await sendRedirect(event, '/login', 302)
-        } else {
-          await navigateTo('/login')
-        }
-        throw e
+      await refreshPromise
+
+      if (import.meta.client) {
+        return await makeRequest()
+      } else {
+        await sendRedirect(event, currentUrl, 302)
+        return
       }
     }
   }
