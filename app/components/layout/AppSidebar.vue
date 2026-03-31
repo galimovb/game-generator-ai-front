@@ -96,8 +96,8 @@ const secondGroup = [
       <SidebarGroup class="mt-auto">
         <SidebarGroupContent>
           <SidebarMenu>
+            <AppSettings/>
             <SidebarMenuItem v-for="item in secondGroup" :key="item.title">
-              <AppSettings/>
               <SidebarMenuButton as-child>
                 <NuxtLink :to="item.url" active-class="bg-sidebar-accent">
                   <component :is="item.icon" />

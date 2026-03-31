@@ -1,13 +1,5 @@
 <script setup lang="ts">
 import { Menu } from 'lucide-vue-next'
-
-const profileStore = useProfileStore()
-const settingsStore = useSettingsStore()
-
-await Promise.all([
-  profileStore.fetchProfile(),
-  settingsStore.fetchSettings()
-])
 </script>
 
 <template>
