@@ -4,6 +4,7 @@ import { toast } from "vue-sonner"
 
 const route = useRoute()
 const { get, patch, del } = useApi()
+const { $toast } = useNuxtApp()
 
 const profileStore = useProfileStore()
 const { profile } = storeToRefs(profileStore)
@@ -94,7 +95,12 @@ const loadData = async () => {
       })
     }
   } catch (err: any) {
-    error.value = err.data?.message || 'Ошибка загрузки игры'
+    $toast.error('Произошла ошибка при загрузке игры',{
+      action: {
+        label: 'Повторить',
+        onClick: () => loadData(),
+      },
+    })
   } finally {
     loading.value = false
   }
@@ -149,8 +155,7 @@ const saveChanges = async () => {
     isEditing.value = false
     toast.success('Изменения сохранены')
   } catch (err: any) {
-    toast.error('Ошибка сохранения изменений')
-    console.error('Ошибка сохранения изменений', err.message)
+    $toast.error('Ошибка сохранения изменений')
   } finally {
     saving.value = false
   }
@@ -194,8 +199,7 @@ const saveStageChanges = async (stageId: number) => {
     editingStageId.value = null
     toast.success('Стадия обновлена')
   } catch (err: any) {
-    toast.error('Ошибка сохранения стадии')
-    console.error('Ошибка сохранения стадии', err.message)
+    $toast.error('Ошибка сохранения стадии')
   } finally {
     savingStageId.value = null
   }
@@ -211,8 +215,7 @@ const deleteStage = async (stageId: number) => {
     }
     toast.success('Стадия удалена')
   } catch (err: any) {
-    toast.error('Ошибка удаления стадии')
-    console.error('Ошибка удаления стадии', err.message)
+    $toast.error('Ошибка удаления стадии')
   } finally {
     deletingStageId.value = null
   }
@@ -228,8 +231,7 @@ const deleteGame = async () => {
       window.location.href = '/games';
     }
   } catch (err: any) {
-    toast.error('Ошибка удаления игры')
-    console.error('Ошибка удаления игры', err.message)
+    $toast.error('Ошибка удаления игры')
   } finally {
     isDeleting.value = false
   }

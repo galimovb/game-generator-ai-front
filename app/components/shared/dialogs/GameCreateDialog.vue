@@ -11,6 +11,7 @@ const emit = defineEmits<{
 }>()
 
 const { post } = useApi()
+const { $toast } = useNuxtApp()
 
 // Форма
 const form = ref({
@@ -89,6 +90,12 @@ const createGame = async () => {
     emit('update:open', false)
   } catch (error) {
     console.error('Ошибка создания игры:', error)
+    $toast.error('Ошибка создания игры',{
+      action: {
+        label: 'Повторить',
+        onClick: () => createGame(),
+      },
+    })
   } finally {
     isCreating.value = false
   }

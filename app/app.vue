@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 const { fontSize, radius, color, isDarkTheme } = storeToRefs(useAppData())
 useHead({
   htmlAttrs: {
@@ -30,7 +29,7 @@ if (!isAuthPage.value) {
 
 <template>
   <NuxtLayout>
-    <Toaster :style="{ '--z-index': '9999' }" position="top-right"/>
+    <Toaster position="top-right" />
     <NuxtPage />
   </NuxtLayout>
 </template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Settings, Moon, Sun } from 'lucide-vue-next'
 import { watchDebounced } from "@vueuse/core";
-import {ModelType} from "@/types/enums";
+import type { ModelType } from "~/types/enums";
 
 const appData = useAppData()
 const { states, updateSettings } = useSettingsStore()

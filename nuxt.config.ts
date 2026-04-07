@@ -20,9 +20,12 @@ export default defineNuxtConfig({
     ]
   },
 
-  modules: ['shadcn-nuxt', '@pinia/nuxt'],
+  modules: ['shadcn-nuxt', '@pinia/nuxt', 'vue-sonner/nuxt'],
   pinia: {
     storesDirs: ['./stores/**'],
+  },
+  vueSonner: {
+    css: true
   },
   shadcn: {
     /**

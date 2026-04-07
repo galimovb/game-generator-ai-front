@@ -14,7 +14,7 @@ export const useApi = () => {
       return await makeRequest()
     } catch (err: any) {
       if (err?.response?.status !== 401) throw err
-      if (url.includes('/auth/refresh')) throw err
+      if (url.includes('/auth/refresh') || url.includes('/login')) throw err
 
       if (!isRefreshing) {
         isRefreshing = true

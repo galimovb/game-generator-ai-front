@@ -5,6 +5,8 @@ definePageMeta({
   layout: 'auth'
 })
 
+const { $toast } = useNuxtApp()
+
 const { post } = useApi()
 
 const loginData = reactive<UserLogin>({
@@ -12,11 +14,9 @@ const loginData = reactive<UserLogin>({
   password: ''
 })
 const loading = ref(false)
-const error = ref('')
 
 const handleSubmit = async () => {
   loading.value = true
-  error.value = ''
 
   try {
     await post('/auth/login', {
@@ -26,7 +26,11 @@ const handleSubmit = async () => {
 
     await navigateTo('/')
   } catch (err) {
-    error.value = err.data?.message || 'Ошибка при входе'
+    $toast.error('Ошибка при входе',{
+      description: JSON.stringify(err)
+    })
+    console.log('err', err.error)
+    console.log('err', err.errorMessage)
   } finally {
     loading.value = false
   }
@@ -70,11 +74,6 @@ const handleSubmit = async () => {
               />
             </div>
           </div>
-
-          <!-- Сообщение об ошибке -->
-          <p v-if="error" class="text-sm text-red-500 mt-4">
-            {{ error }}
-          </p>
 
           <Button
               type="submit"

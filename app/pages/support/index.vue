@@ -14,6 +14,7 @@ import {
 const router = useRouter()
 const route = useRoute()
 const api = useApi()
+const { $toast } = useNuxtApp()
 const profileStore = useProfileStore()
 
 /**
@@ -289,6 +290,7 @@ const sendMessage = async () => {
     selectedPhotos.value = []
     photoPreviews.value = []
   } catch (error) {
+    $toast.error('Ошибка отправки сообщения')
     console.error('Failed to send message', error)
   } finally {
     sending.value = false

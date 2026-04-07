@@ -6,6 +6,7 @@ definePageMeta({
 })
 
 const { post } = useApi()
+const { $toast } = useNuxtApp()
 const router = useRouter()
 
 // Состояние формы регистрации
@@ -41,6 +42,7 @@ const handleSubmit = async () => {
     await router.push('/login')
   } catch (err: any) {
     error.value = err.data?.message || 'Ошибка при регистрации'
+    $toast.error('Ошибка при регистрации')
   } finally {
     loading.value = false
   }

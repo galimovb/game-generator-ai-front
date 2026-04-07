@@ -31,12 +31,10 @@ export const useGamesList = (options: {
         }
     )
 
-    // Используем ref вместо computed
     const games = ref<Game[]>([])
     const total = ref(0)
     const loading = computed(() => pending.value)
 
-    // Обновляем ref когда данные загружены
     watch(data, (newData) => {
         if (newData?.result) {
             games.value = newData.result.items

@@ -2,6 +2,7 @@ import type { UserSettings } from '~/types/user'
 
 export const useSettingsStore = defineStore('settings', () => {
     const { get, patch } = useApi()
+    const { $toast } = useNuxtApp()
 
     const states = reactive({
         settings: {
@@ -25,17 +26,21 @@ export const useSettingsStore = defineStore('settings', () => {
         }
     }
 
-    async function updateSettings(data: Partial<typeof state.settings>) {
+    async function updateSettings(data: Partial<typeof states.settings>) {
         if(states.loading) return
 
         states.loading = true
         states.error = null
         try {
-            const { result } = await patch('/users/profile/settings', data)
+            const { result } = await patch('/users/profile/settiвувngs', data)
             Object.assign(states.settings, result)
         } catch (err: any) {
-            states.error = err.data?.message || 'Ошибка сохранения'
-            throw err
+            $toast.error('Ошибка обновления настроек', {
+                action: {
+                    label: 'Повторить',
+                    onClick: () => updateSettings(data),
+                },
+            })
         } finally {
             states.loading = false
         }

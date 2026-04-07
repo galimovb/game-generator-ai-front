@@ -19,7 +19,7 @@ const delegatedProps = reactiveOmit(props, "toastOptions")
           'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
         cancelButton:
           'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground',
-      },
+      }
     }"
     v-bind="delegatedProps"
   >

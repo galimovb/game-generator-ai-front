@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Send, Loader, MessageCircle, Reply, X, MoreVertical, Trash2 } from 'lucide-vue-next'
-import { toast } from "vue-sonner"
 import type { GameComment } from '~/types/game'
 
 const props = defineProps<{
@@ -15,6 +14,7 @@ const emit = defineEmits<{
 }>()
 
 const { get, post, del } = useApi()
+const { $toast } = useNuxtApp()
 const profileStore = useProfileStore()
 
 const currentUserId = computed(() => profileStore.profile?.id)
@@ -57,7 +57,12 @@ const loadComments = async (reset = false) => {
     state.hasMore = state.comments.length < res.result.pagination.total
     state.page++
   } catch (err) {
-    toast.error('Ошибка загрузки комментариев')
+    $toast.error('Ошибка загрузки комментариев',{
+      action: {
+        label: 'Повторить',
+        onClick: () => loadComments(reset),
+      },
+    })
   } finally {
     state.loading = false
   }
@@ -77,7 +82,12 @@ const submitComment = async () => {
     state.form.parentId = null
     emit('comment:created', props.gameId)
   } catch (err) {
-    toast.error('Ошибка при отправке')
+    $toast.error('Ошибка отправки комментария',{
+      action: {
+        label: 'Повторить',
+        onClick: () => submitComment(),
+      },
+    })
   } finally {
     state.form.submitting = false
   }
@@ -88,9 +98,14 @@ const deleteComment = async (commentId: number) => {
     await del(`/games/${props.gameId}/comments/${commentId}`)
     state.comments = state.comments.filter(c => c.id !== commentId)
     emit('comment:deleted', props.gameId)
-    toast.success('Комментарий удален')
+    $toast.success('Комментарий удален')
   } catch (err) {
-    toast.error('Ошибка при удалении')
+    $toast.error('Ошибка удаления комментария',{
+      action: {
+        label: 'Повторить',
+        onClick: () => deleteComment(commentId),
+      },
+    })
   }
 }
 const setReplyTo = (comment: GameComment) => {

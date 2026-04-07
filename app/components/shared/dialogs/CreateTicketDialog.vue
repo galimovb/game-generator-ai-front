@@ -5,6 +5,8 @@ const emit = defineEmits<{
   success: [ticket: any]
 }>()
 
+const { $toast } = useNuxtApp()
+
 const open = ref<boolean>(false)
 const loading = ref<boolean>(false)
 const error = ref<string | null>(null)
@@ -54,7 +56,12 @@ const createTicket = async ():Promise<void> => {
     resetForm()
 
   } catch (err: any) {
-    error.value = err.response?.data?.message || 'Ошибка при создании тикета'
+    $toast.error('Ошибка при создании тикета',{
+      action: {
+        label: 'Повторить',
+        onClick: () => createTicket(),
+      },
+    })
   } finally {
     loading.value = false
   }

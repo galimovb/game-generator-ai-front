@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Heart, MessageCircle } from 'lucide-vue-next'
+import type { Game } from '~/types/game'
 
 const { post, del } = useApi()
+const { $toast } = useNuxtApp()
 
 const props = withDefaults(defineProps<{
   game: Game
@@ -32,7 +34,12 @@ const toggleLike = async () => {
     }
     emit('like:toggle', props.game.id)
   } catch (e) {
-    console.error('Ошибка лайка', e)
+    $toast.error('Произошла ошибка',{
+      action: {
+        label: 'Повторить',
+        onClick: () => toggleLike(),
+      },
+    })
   }
 }
 
