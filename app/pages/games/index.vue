@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { games, loading } = useGamesList({
+const { games, loading, incrementComments, decrementComments, toggleLike } = useGamesList({
   endpoint: '/games',
   key: 'games-list',
 })
@@ -15,6 +15,9 @@ const { games, loading } = useGamesList({
         :games="games"
         :loading="loading"
         empty-text="Пока никто не выложил игру"
+        @comment:created="incrementComments"
+        @comment:deleted="decrementComments"
+        @like:toggle="toggleLike"
     />
   </div>
 </template>

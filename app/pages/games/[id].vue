@@ -399,6 +399,7 @@ onMounted(async () => {
                     <AlertDialogCancel>Отмена</AlertDialogCancel>
                     <AlertDialogAction
                         class="bg-destructive hover:bg-destructive/80"
+                        :disabled="isDeleting"
                         @click="deleteGame"
                     >
                       <span v-if="!isDeleting">Удалить</span>

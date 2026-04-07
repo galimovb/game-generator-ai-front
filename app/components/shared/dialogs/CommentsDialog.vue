@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { Send, Loader, MessageCircle, Reply, X, MoreVertical, Trash2 } from 'lucide-vue-next'
 import { toast } from "vue-sonner"
+import type { GameComment } from '~/types/game'
 
 const props = defineProps<{
   gameId: number
   open: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
+  (e: 'comment:created', gameId: number): void
+  (e: 'comment:deleted', gameId: number): void
 }>()
 
 const { get, post, del } = useApi()
@@ -72,6 +75,7 @@ const submitComment = async () => {
     state.comments.push(res.result)
     state.form.text = ''
     state.form.parentId = null
+    emit('comment:created', props.gameId)
   } catch (err) {
     toast.error('Ошибка при отправке')
   } finally {
@@ -83,12 +87,12 @@ const deleteComment = async (commentId: number) => {
   try {
     await del(`/games/${props.gameId}/comments/${commentId}`)
     state.comments = state.comments.filter(c => c.id !== commentId)
+    emit('comment:deleted', props.gameId)
     toast.success('Комментарий удален')
   } catch (err) {
     toast.error('Ошибка при удалении')
   }
 }
-
 const setReplyTo = (comment: GameComment) => {
   state.form.parentId = comment.id
   state.form.text = ''

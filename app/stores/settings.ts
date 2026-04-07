@@ -26,6 +26,8 @@ export const useSettingsStore = defineStore('settings', () => {
     }
 
     async function updateSettings(data: Partial<typeof state.settings>) {
+        if(states.loading) return
+
         states.loading = true
         states.error = null
         try {

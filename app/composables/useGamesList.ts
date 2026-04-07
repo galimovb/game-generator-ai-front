@@ -31,9 +31,44 @@ export const useGamesList = (options: {
         }
     )
 
-    const games = computed(() => data.value?.result?.items || [])
-    const total = computed(() => data.value?.result?.pagination?.total || 0)
+    // Используем ref вместо computed
+    const games = ref<Game[]>([])
+    const total = ref(0)
     const loading = computed(() => pending.value)
+
+    // Обновляем ref когда данные загружены
+    watch(data, (newData) => {
+        if (newData?.result) {
+            games.value = newData.result.items
+            total.value = newData.result.pagination.total
+        }
+    }, { immediate: true })
+
+    const updateGameCommentsCount = (gameId: number, change: number) => {
+        const index = games.value.findIndex(g => g.id === gameId)
+        if (index !== -1) {
+            games.value[index] = {
+                ...games.value[index],
+                commentsCount: Math.max(0, games.value[index].commentsCount + change)
+            }
+        }
+    }
+
+    const incrementComments = (gameId: number) => updateGameCommentsCount(gameId, 1)
+    const decrementComments = (gameId: number) => updateGameCommentsCount(gameId, -1)
+
+    const toggleLike = (gameId: number) => {
+        const index = games.value.findIndex(g => g.id === gameId)
+        if (index !== -1) {
+            const game = games.value[index]
+            const newIsLiked = !game.isLiked
+            games.value[index] = {
+                ...game,
+                isLiked: newIsLiked,
+                likesCount: game.likesCount + (newIsLiked ? 1 : -1)
+            }
+        }
+    }
 
     return {
         page,
@@ -41,6 +76,9 @@ export const useGamesList = (options: {
         games,
         total,
         loading,
-        refresh
+        refresh,
+        incrementComments,
+        decrementComments,
+        toggleLike
     }
 }

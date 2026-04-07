@@ -11,6 +11,12 @@ const props = withDefaults(defineProps<{
   showLikeButton: true
 })
 
+const emit = defineEmits<{
+  (e: 'like:toggle', gameId: number): void
+  (e: 'comment:created', gameId: number): void
+  (e: 'comment:deleted', gameId: number): void
+}>()
+
 const showComments = ref(false)
 
 const openComments = () => {
@@ -24,9 +30,18 @@ const toggleLike = async () => {
     } else {
       await post(`/games/${props.game.id}/like`)
     }
+    emit('like:toggle', props.game.id)
   } catch (e) {
     console.error('Ошибка лайка', e)
   }
+}
+
+const handleCommentCreated = (gameId: number) => {
+  emit('comment:created', gameId)
+}
+
+const handleCommentDeleted = (gameId: number) => {
+  emit('comment:deleted', gameId)
 }
 </script>
 
@@ -119,5 +134,7 @@ const toggleLike = async () => {
   <CommentsDialog
       v-model:open="showComments"
       :game-id="game.id"
+      @comment:created="handleCommentCreated"
+      @comment:deleted="handleCommentDeleted"
   />
 </template>

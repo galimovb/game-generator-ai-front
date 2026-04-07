@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const showCreateDialog = ref(false)
 
-const { games, loading, refresh } = useGamesList({
+const { games, loading, incrementComments, decrementComments, toggleLike } = useGamesList({
   endpoint: '/games/my',
   key: 'my-games'
 })
@@ -24,6 +24,9 @@ const loadGames = () => refresh()
         :loading="loading"
         show-actions
         empty-text="У вас пока нет игр"
+        @comment:created="incrementComments"
+        @comment:deleted="decrementComments"
+        @like:toggle="toggleLike"
     />
 
     <GameCreateDialog

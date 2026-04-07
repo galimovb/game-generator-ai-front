@@ -30,6 +30,7 @@ if (!isAuthPage.value) {
 
 <template>
   <NuxtLayout>
+    <Toaster :style="{ '--z-index': '9999' }" position="top-right"/>
     <NuxtPage />
   </NuxtLayout>
 </template>
