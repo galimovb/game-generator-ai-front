@@ -2,22 +2,23 @@ export interface Game {
     id: number
     title: string | null
     description: string | null
-    authorId: number
-    minAge: number | null
-    maxAge: number | null
-    minPlayers: number | null
-    maxPlayers: number | null
+    author: User
+    age: number | null
+    players: number | null
     duration: number | null
-    locationType: string | null
+    locationType:  GameLocationType
+    fieldWidth: number | null
+    fieldLength: number | null
+    activityLevel: GameActivityLevel
     photos: string[] | null
     requisites: string[] | null
     isPublic: boolean | null
     stages: Stage[]
+    commentsCount: number
+    likesCount: number
+    isLiked: boolean
     createdAt: string
     updatedAt: string | null,
-    likesCount: number,
-    commentsCount: number,
-    isLiked: boolean,
 }
 
 export interface Stage {
@@ -27,5 +28,4 @@ export interface Stage {
     duration: number
     tasks: string[]
     props: string[]
-    stageOrder: number
 }

@@ -1,5 +1,3 @@
-import type {UserProfile} from "./user";
-
 export interface GameComment {
     id: number
     gameId: number

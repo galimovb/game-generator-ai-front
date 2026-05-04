@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Plus, Check, X, Loader, Pencil, Trash2 } from 'lucide-vue-next'
+import { Plus, Check, X, Loader, Pencil, Trash2, Image as ImageIcon } from 'lucide-vue-next'
 import { toast } from "vue-sonner"
 
 const route = useRoute()
@@ -13,7 +13,7 @@ const { profile } = storeToRefs(profileStore)
 const game = ref<Game | null>(null)
 const loading = ref(true)
 const saving = ref(false)
-const error = ref('')
+const isLoadingError = ref(false)
 const isAuthor = ref(false)
 const isEditing = ref(false)
 const isDeleting = ref(false)
@@ -24,13 +24,7 @@ const deletingStageId = ref<number | null>(null)
 
 // Редактирование стадий
 const editingStageId = ref<number | null>(null)
-const stageForms = ref<Record<number, {
-  title: string
-  description: string
-  duration: number
-  tasks: string[]
-  props: string[]
-}>>({})
+const editingStageData = ref<Required<Omit<Stage, 'id'>>| null>(null)
 
 // Новые поля для добавления
 const newStageTask = ref('')
@@ -42,28 +36,26 @@ const addingPropForStage = ref<number | null>(null)
 const form = ref({
   title: '',
   description: '',
-  minAge: 0,
-  maxAge: 0,
-  minPlayers: 0,
-  maxPlayers: 0,
+  age: 0,
+  players: 0,
   duration: 0,
   locationType: '',
+  fieldWidth: 0,
+  fieldLength: 0,
+  activityLevel: '',
   requisites: [] as string[],
   isPublic: false
 })
 
-// Новый реквизит
 const newRequisite = ref('')
 const isAddingRequisit = ref(false)
 
-// Загрузка данных
 const loadData = async () => {
   loading.value = true
-  error.value = ''
+  isLoadingError.value = false
 
   try {
     const gameId = route.params.id
-
     const gameResponse = await get(`/games/${gameId}`)
     game.value = gameResponse.result
 
@@ -73,34 +65,25 @@ const loadData = async () => {
       form.value = {
         title: game.value.title || '',
         description: game.value.description || '',
-        minAge: game.value.minAge || 0,
-        maxAge: game.value.maxAge || 0,
-        minPlayers: game.value.minPlayers || 0,
-        maxPlayers: game.value.maxPlayers || 0,
+        age: game.value.age || 0,
+        players: game.value.players || 0,
         duration: game.value.duration || 0,
         locationType: game.value.locationType || '',
+        fieldWidth: game.value.fieldWidth || 0,
+        fieldLength: game.value.fieldLength || 0,
+        activityLevel: game.value.activityLevel || '',
         requisites: game.value.requisites || [],
         isPublic: game.value.isPublic || false
       }
-
-      // Инициализация форм стадий
-      game.value.stages?.forEach(stage => {
-        stageForms.value[stage.id] = {
-          title: stage.title || '',
-          description: stage.description || '',
-          duration: stage.duration || 0,
-          tasks: stage.tasks || [],
-          props: stage.props || []
-        }
-      })
     }
   } catch (err: any) {
-    $toast.error('Произошла ошибка при загрузке игры',{
+    $toast.error('Произошла ошибка при загрузке игры', {
       action: {
         label: 'Повторить',
         onClick: () => loadData(),
       },
     })
+    isLoadingError.value = true
   } finally {
     loading.value = false
   }
@@ -112,12 +95,13 @@ const startEditing = () => {
     form.value = {
       title: game.value.title || '',
       description: game.value.description || '',
-      minAge: game.value.minAge || 0,
-      maxAge: game.value.maxAge || 0,
-      minPlayers: game.value.minPlayers || 0,
-      maxPlayers: game.value.maxPlayers || 0,
+      age: game.value.age || 0,
+      players: game.value.players || 0,
       duration: game.value.duration || 0,
       locationType: game.value.locationType || '',
+      fieldWidth: game.value.fieldWidth || 0,
+      fieldLength: game.value.fieldLength || 0,
+      activityLevel: game.value.activityLevel || '',
       requisites: game.value.requisites || [],
       isPublic: game.value.isPublic || false
     }
@@ -161,42 +145,39 @@ const saveChanges = async () => {
   }
 }
 
-// ===== ФУНКЦИИ ДЛЯ СТАДИЙ =====
-
-// Начать редактирование стадии
-const startEditingStage = (stageId: number) => {
-  editingStageId.value = stageId
+const startEditingStage = (stage: Stage) => {
+  editingStageId.value = stage.id
+  editingStageData.value = {
+    title: stage.title,
+    description: stage.description,
+    duration: stage.duration,
+    tasks: [...stage.tasks],
+    props: [...stage.props]
+  }
 }
 
 // Отмена редактирования стадии
-const cancelEditingStage = (stageId: number) => {
+const cancelEditingStage = () => {
   editingStageId.value = null
-  // Восстанавливаем исходные данные
-  const stage = game.value?.stages?.find(s => s.id === stageId)
-  if (stage) {
-    stageForms.value[stageId] = {
-      title: stage.title || '',
-      description: stage.description || '',
-      duration: stage.duration || 0,
-      tasks: stage.tasks || [],
-      props: stage.props || []
-    }
-  }
+  editingStageData.value = null
+  addingTaskForStage.value = null
+  addingPropForStage.value = null
+  newStageTask.value = ''
+  newStageProp.value = ''
 }
 
 // Сохранение изменений стадии
 const saveStageChanges = async (stageId: number) => {
-  if (!game.value) return
+  if (!game.value || !editingStageData.value) return
 
   savingStageId.value = stageId
   try {
-    const response = await patch(`/games/${game.value.id}/stages/${stageId}`, stageForms.value[stageId])
-    // Обновляем данные в game
+    const response = await patch(`/games/${game.value.id}/stages/${stageId}`, editingStageData.value)
     const stageIndex = game.value.stages.findIndex(s => s.id === stageId)
     if (stageIndex !== -1) {
       game.value.stages[stageIndex] = response.result
     }
-    editingStageId.value = null
+    cancelEditingStage()
     toast.success('Стадия обновлена')
   } catch (err: any) {
     $toast.error('Ошибка сохранения стадии')
@@ -238,37 +219,35 @@ const deleteGame = async () => {
 }
 
 // Добавление задачи к стадии
-const addStageTask = (stageId: number) => {
-  if (newStageTask.value.trim()) {
-    if (!stageForms.value[stageId].tasks) {
-      stageForms.value[stageId].tasks = []
-    }
-    stageForms.value[stageId].tasks.push(newStageTask.value.trim())
+const addStageTask = () => {
+  if (newStageTask.value.trim() && editingStageData.value) {
+    editingStageData.value.tasks.push(newStageTask.value.trim())
     newStageTask.value = ''
     addingTaskForStage.value = null
   }
 }
 
 // Удаление задачи из стадии
-const removeStageTask = (stageId: number, taskIndex: number) => {
-  stageForms.value[stageId].tasks.splice(taskIndex, 1)
+const removeStageTask = (taskIndex: number) => {
+  if (editingStageData.value) {
+    editingStageData.value.tasks.splice(taskIndex, 1)
+  }
 }
 
 // Добавление реквизита к стадии
-const addStageProp = (stageId: number) => {
-  if (newStageProp.value.trim()) {
-    if (!stageForms.value[stageId].props) {
-      stageForms.value[stageId].props = []
-    }
-    stageForms.value[stageId].props.push(newStageProp.value.trim())
+const addStageProp = () => {
+  if (newStageProp.value.trim() && editingStageData.value) {
+    editingStageData.value.props.push(newStageProp.value.trim())
     newStageProp.value = ''
     addingPropForStage.value = null
   }
 }
 
 // Удаление реквизита из стадии
-const removeStageProp = (stageId: number, propIndex: number) => {
-  stageForms.value[stageId].props.splice(propIndex, 1)
+const removeStageProp = (propIndex: number) => {
+  if (editingStageData.value) {
+    editingStageData.value.props.splice(propIndex, 1)
+  }
 }
 
 // Загрузка при монтировании
@@ -278,565 +257,328 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="container mx-auto py-8 px-4">
-    <!-- Скелетон загрузки -->
-    <div v-if="loading">
-      <Card>
-        <CardHeader>
-          <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
-            <div class="space-y-2 w-full sm:w-auto flex-1">
-              <Skeleton class="h-8 w-full sm:w-3/4" />
-              <Skeleton class="h-4 w-full sm:w-1/2" />
-            </div>
-            <Skeleton class="h-10 w-full sm:w-24" />
-          </div>
-        </CardHeader>
-
-        <CardContent class="space-y-6">
-          <!-- Скелетон фото -->
-          <div class="space-y-2">
-            <Skeleton class="h-4 w-24" />
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-              <Skeleton v-for="i in 4" :key="i" class="aspect-square w-full rounded" />
-            </div>
-          </div>
-
-          <!-- Скелетон описания -->
-          <div class="space-y-2">
-            <Skeleton class="h-4 w-20" />
-            <Skeleton class="h-4 w-full" />
-            <Skeleton class="h-4 w-5/6" />
-            <Skeleton class="h-4 w-4/6" />
-          </div>
-
-          <!-- Скелетон параметров -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div v-for="i in 4" :key="i" class="space-y-1">
-              <Skeleton class="h-3 w-12" />
-              <Skeleton class="h-5 w-16" />
-            </div>
-          </div>
-
-          <!-- Скелетон реквизита -->
-          <div class="space-y-2">
-            <Skeleton class="h-4 w-20" />
-            <div class="flex flex-wrap gap-2">
-              <Skeleton v-for="i in 4" :key="i" class="h-6 w-16 rounded" />
-            </div>
-          </div>
-
-          <!-- Скелетон статуса -->
-          <Skeleton class="h-6 w-24" />
-
-          <!-- Скелетон стадий -->
-          <div class="space-y-3">
-            <Skeleton class="h-4 w-32" />
-            <div class="grid grid-cols-1 gap-3">
-              <Card v-for="i in 2" :key="i">
-                <CardHeader class="pb-2">
-                  <div class="flex flex-col sm:flex-row justify-between gap-2">
-                    <Skeleton class="h-5 w-full sm:w-32" />
-                    <Skeleton class="h-4 w-12" />
-                  </div>
-                  <Skeleton class="h-4 w-full mt-2" />
-                </CardHeader>
-                <CardContent class="pt-0 space-y-2">
-                  <Skeleton class="h-3 w-20" />
-                  <Skeleton class="h-4 w-full" />
-                  <Skeleton class="h-4 w-5/6" />
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-
-    <!-- Ошибка -->
-    <div v-else-if="error" class="text-center py-12">
-      <p class="text-destructive">{{ error }}</p>
+  <div class="container mx-auto py-4 md:px-2 md:py-6 lg:py-8 lg:px-4">
+    <div v-if="isLoadingError" class="text-center py-12">
+      <p class="text-destructive">Произошла ошибка при загрузке игры</p>
       <Button class="mt-4" @click="loadData">Повторить</Button>
     </div>
 
-    <!-- Контент -->
-    <div v-else-if="game">
-      <Card>
-        <CardHeader>
-          <div class="flex flex-row justify-between items-start gap-4">
-            <div>
-              <CardTitle class="text-2xl break-words">
-                {{ game.title || 'Без названия' }}
-              </CardTitle>
-            </div>
+    <Card v-else>
+      <CardHeader>
+        <div class="flex justify-between items-start gap-4">
+          <CardTitle class="md:text-xl break-words flex-1">
+            <Skeleton v-if="loading" class="h-8" />
+            <Input v-else-if="isEditing" v-model="form.title" placeholder="Название игры" :disabled="saving" />
+            <template v-else>{{ game?.title || 'Без названия' }}</template>
+          </CardTitle>
 
-            <div v-if="isAuthor && !isEditing" class="flex gap-2 items-center">
-              <!-- Кнопка редактирования игры -->
-              <Button
-                  @click="startEditing"
-                  variant="link"
-                  size="sm"
-                  :disabled="saving || !!savingStageId || !!deletingStageId"
-              >
-                Изменить
-              </Button>
-              <AlertDialog>
-                <AlertDialogTrigger as-child>
-                  <Button
-                      variant="ghost"
-                      size="sm"
-                      class="hover:text-destructive"
-                      :disabled="saving || !!savingStageId || !!deletingStageId"
-                  >
-                    <Trash2 :size="16"/>
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Вы уверены?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Восстановить игру будет невозможно
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Отмена</AlertDialogCancel>
-                    <AlertDialogAction
-                        class="bg-destructive hover:bg-destructive/80"
-                        :disabled="isDeleting"
-                        @click="deleteGame"
-                    >
-                      <span v-if="!isDeleting">Удалить</span>
-                      <Loader v-else class="animate-spin"/>
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-
-            <div v-else class="flex items-center gap-2" title="Автор">
-              <User name-position="left" :user="game.author" :size="9" name-field="email"/>
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent class="space-y-6">
-          <!-- Фото -->
-          <div v-if="game.photos?.length" class="space-y-2">
-            <Label>Фотографии</Label>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-              <img
-                  v-for="(photo, idx) in game.photos"
-                  :key="idx"
-                  :src="getPhotoUrl(photo)"
-                  class="aspect-square w-full rounded object-cover border"
-                  alt="Game photo"
-              />
-            </div>
-          </div>
-
-          <!-- РЕЖИМ ПРОСМОТРА ИГРЫ -->
-          <div v-if="!isEditing" class="space-y-4">
-            <!-- Описание -->
-            <div v-if="game.description" class="space-y-1">
-              <Label>Описание</Label>
-              <p class="text-sm break-words">{{ game.description }}</p>
-            </div>
-
-            <!-- Параметры -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div class="space-y-1">
-                <Label class="text-xs">Возраст</Label>
-                <p class="text-sm font-medium">{{ game.minAge }}-{{ game.maxAge }} лет</p>
-              </div>
-              <div class="space-y-1">
-                <Label class="text-xs">Игроки</Label>
-                <p class="text-sm font-medium">{{ game.minPlayers }}-{{ game.maxPlayers }}</p>
-              </div>
-              <div class="space-y-1">
-                <Label class="text-xs">Длительность</Label>
-                <p class="text-sm font-medium">{{ game.duration }} мин</p>
-              </div>
-              <div class="space-y-1">
-                <Label class="text-xs">Локация</Label>
-                <p class="text-sm font-medium">{{ gameLocationTypes[game?.locationType] }}</p>
-              </div>
-            </div>
-
-            <!-- Реквизит -->
-            <div v-if="game.requisites?.length" class="space-y-1">
-              <Label>Реквизит</Label>
-              <div class="flex flex-wrap gap-2">
-                <Badge
-                    v-for="(item, idx) in game.requisites"
-                    :key="idx"
-                    variant="outline"
-                    class="break-all"
-                >
-                  {{ item }}
-                </Badge>
-              </div>
-            </div>
-
-            <!-- Статус публичности -->
-            <div class="flex items-center gap-2">
-              <Badge :variant="game.isPublic ? 'default' : 'secondary'">
-                {{ game.isPublic ? 'Публичная' : 'Черновик' }}
-              </Badge>
-            </div>
-
-            <!-- Стадии -->
-            <div v-if="game.stages?.length" class="space-y-3">
-              <Label>Стадии игры ({{ game.stages.length }})</Label>
-              <div class="grid grid-cols-1 gap-3">
-                <Card
-                    v-for="stage in game.stages"
-                    :key="stage.id"
-                >
-                  <!-- Режим просмотра стадии -->
-                  <div v-if="editingStageId !== stage.id">
-                    <CardHeader class="pb-2">
-                      <div class="flex items-start justify-between">
-                        <CardTitle class="text-base break-words pr-2">
-                          {{ stage.title }}
-                        </CardTitle>
-                        <div class="flex items-center gap-1 flex-shrink-0">
-                          <span class="text-sm text-muted-foreground whitespace-nowrap mr-2">
-                            {{ stage.duration }} мин
-                          </span>
-                          <!-- Кнопки управления стадией (только в режиме редактирования игры) -->
-                          <Button
-                              variant="ghost"
-                              size="xs"
-                              class="h-8 w-8"
-                              title="Редактировать стадию"
-                              @click="startEditingStage(stage.id)"
-                              :disabled="!!savingStageId || !!deletingStageId"
-                          >
-                            <Pencil :size="16" />
-                          </Button>
-                          <Button
-                              variant="ghost"
-                              size="xs"
-                              class="h-8 w-8 hover:text-destructive"
-                              title="Удалить стадию"
-                              @click="deleteStage(stage.id)"
-                              :disabled="deletingStageId === stage.id || !!savingStageId"
-                          >
-                            <Loader v-if="deletingStageId === stage.id" class="w-4 h-4 animate-spin" />
-                            <Trash2 v-else :size="16" />
-                          </Button>
-                        </div>
-                      </div>
-                      <CardDescription class="break-words">{{ stage.description }}</CardDescription>
-                    </CardHeader>
-                    <CardContent class="pt-0 space-y-2">
-                      <div v-if="stage.tasks?.length">
-                        <p class="text-xs font-medium text-muted-foreground mb-1">Задания:</p>
-                        <ul class="list-disc list-inside text-sm space-y-0.5">
-                          <li v-for="(task, idx) in stage.tasks" :key="idx" class="break-words">
-                            {{ task }}
-                          </li>
-                        </ul>
-                      </div>
-                      <div v-if="stage.props?.length">
-                        <p class="text-xs font-medium text-muted-foreground mb-1">Реквизит этапа:</p>
-                        <div class="flex flex-wrap gap-1">
-                          <Badge
-                              v-for="(prop, idx) in stage.props"
-                              :key="idx"
-                              variant="outline"
-                              class="text-xs break-all"
-                          >
-                            {{ prop }}
-                          </Badge>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </div>
-
-                  <!-- Режим редактирования стадии -->
-                  <div v-else>
-                    <CardHeader class="pb-2">
-                      <div class="flex items-start justify-between gap-2">
-                        <Input
-                            v-model="stageForms[stage.id].title"
-                            placeholder="Название стадии"
-                            class="flex-1"
-                            :disabled="savingStageId === stage.id"
-                        />
-                        <div class="flex items-center gap-1 flex-shrink-0">
-                          <Button
-                              variant="ghost"
-                              size="xs"
-                              class="h-8 w-8 text-primary"
-                              title="Сохранить"
-                              @click="saveStageChanges(stage.id)"
-                              :disabled="savingStageId === stage.id"
-                          >
-                            <Loader v-if="savingStageId === stage.id" class="w-4 h-4 animate-spin" />
-                            <Check v-else :size="16" />
-                          </Button>
-                          <Button
-                              variant="ghost"
-                              size="xs"
-                              class="h-8 w-8"
-                              title="Выйти из режима редактирования"
-                              @click="cancelEditingStage(stage.id)"
-                              :disabled="savingStageId === stage.id"
-                          >
-                            <X :size="16" />
-                          </Button>
-                        </div>
-                      </div>
-                      <Textarea
-                          v-model="stageForms[stage.id].description"
-                          placeholder="Описание стадии"
-                          rows="2"
-                          class="mt-2"
-                          :disabled="savingStageId === stage.id"
-                      />
-                      <div class="flex items-center gap-2 mt-2">
-                        <Label class="text-sm">Длительность (мин)</Label>
-                        <Input
-                            v-model.number="stageForms[stage.id].duration"
-                            type="number"
-                            min="1"
-                            class="w-24"
-                            :disabled="savingStageId === stage.id"
-                        />
-                      </div>
-                    </CardHeader>
-                    <CardContent class="pt-0 space-y-3">
-                      <!-- Задания -->
-                      <div class="space-y-2">
-                        <div class="flex items-center gap-2">
-                          <Label class="text-sm">Задания</Label>
-                          <Button
-                              variant="outline"
-                              size="xs"
-                              @click="addingTaskForStage = stage.id"
-                              v-if="addingTaskForStage !== stage.id && savingStageId !== stage.id"
-                              :disabled="savingStageId === stage.id"
-                          >
-                            <Plus :size="14" />
-                          </Button>
-                        </div>
-
-                        <div class="space-y-1">
-                          <div
-                              v-for="(task, idx) in stageForms[stage.id].tasks"
-                              :key="idx"
-                              class="flex items-center gap-2 group"
-                          >
-                            <span class="text-sm flex-1 break-words">• {{ task }}</span>
-                            <Button
-                                variant="ghost"
-                                size="xs"
-                                class="h-6 w-6 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
-                                @click="removeStageTask(stage.id, idx)"
-                                :disabled="savingStageId === stage.id"
-                                v-if="savingStageId !== stage.id"
-                            >
-                              <X :size="12" />
-                            </Button>
-                          </div>
-
-                          <div v-if="addingTaskForStage === stage.id" class="flex items-center gap-2 mt-1">
-                            <Input
-                                v-model="newStageTask"
-                                placeholder="Новое задание"
-                                class="flex-1"
-                                @keyup.enter="addStageTask(stage.id)"
-                                :disabled="savingStageId === stage.id"
-                            />
-                            <Button size="xs" @click="addStageTask(stage.id)" :disabled="savingStageId === stage.id">
-                              <Check :size="14" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Реквизит стадии -->
-                      <div class="space-y-2">
-                        <div class="flex items-center gap-2">
-                          <Label class="text-sm">Реквизит этапа</Label>
-                          <Button
-                              variant="outline"
-                              size="xs"
-                              @click="addingPropForStage = stage.id"
-                              v-if="addingPropForStage !== stage.id && savingStageId !== stage.id"
-                              :disabled="savingStageId === stage.id"
-                          >
-                            <Plus :size="14" />
-                          </Button>
-                        </div>
-
-                        <div class="flex flex-wrap gap-1">
-                          <div
-                              v-for="(prop, idx) in stageForms[stage.id].props"
-                              :key="idx"
-                              class="flex items-center gap-1 bg-muted px-2 py-1 rounded-md text-sm group"
-                          >
-                            <span class="break-all">{{ prop }}</span>
-                            <Button
-                                variant="ghost"
-                                class="p-0.5 h-5 hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
-                                @click="removeStageProp(stage.id, idx)"
-                                :disabled="savingStageId === stage.id"
-                                v-if="savingStageId !== stage.id"
-                            >
-                              <X :size="12" />
-                            </Button>
-                          </div>
-
-                          <div v-if="addingPropForStage === stage.id" class="flex items-center gap-2">
-                            <Input
-                                v-model="newStageProp"
-                                placeholder="Новый реквизит"
-                                class="w-40"
-                                @keyup.enter="addStageProp(stage.id)"
-                                :disabled="savingStageId === stage.id"
-                            />
-                            <Button size="xs" @click="addStageProp(stage.id)" :disabled="savingStageId === stage.id">
-                              <Check :size="14" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </div>
-                </Card>
-              </div>
-            </div>
-          </div>
-
-          <!-- РЕЖИМ РЕДАКТИРОВАНИЯ ИГРЫ -->
-          <div v-else class="space-y-4">
-            <!-- Название -->
-            <div class="space-y-2">
-              <Label>Название</Label>
-              <Input v-model="form.title" placeholder="Название игры" :disabled="saving" />
-            </div>
-
-            <!-- Описание -->
-            <div class="space-y-2">
-              <Label>Описание</Label>
-              <Textarea v-model="form.description" placeholder="Описание игры" rows="3" :disabled="saving" />
-            </div>
-
-            <!-- Возраст -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <Label>Мин. возраст</Label>
-                <Input v-model.number="form.minAge" type="number" min="3" max="80" :disabled="saving" />
-              </div>
-              <div class="space-y-2">
-                <Label>Макс. возраст</Label>
-                <Input v-model.number="form.maxAge" type="number" min="3" max="80" :disabled="saving" />
-              </div>
-            </div>
-
-            <!-- Игроки -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <Label>Мин. игроков</Label>
-                <Input v-model.number="form.minPlayers" type="number" min="1" :disabled="saving" />
-              </div>
-              <div class="space-y-2">
-                <Label>Макс. игроков</Label>
-                <Input v-model.number="form.maxPlayers" type="number" min="1" :disabled="saving" />
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <!-- Длительность -->
-              <div class="space-y-2">
-                <Label>Длительность (минут)</Label>
-                <Input v-model.number="form.duration" type="number" min="5" :disabled="saving" />
-              </div>
-
-              <!-- Тип локации -->
-              <div class="space-y-2">
-                <Label>Тип локации</Label>
-                <Select v-model="form.locationType" :disabled="saving">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Выберите тип" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem
-                        v-for="(value, key) in gameLocationTypes"
-                        :value="key"
-                    >
-                      {{value}}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <!-- Реквизит -->
-            <div class="space-y-2">
-              <div class="flex items-center gap-2">
-                <Label>Реквизит</Label>
-                <Button variant="outline" size="xs" @click="isAddingRequisit = !isAddingRequisit" :disabled="saving">
-                  <Plus :size="16"/>
+          <div v-if="!loading && isAuthor && !isEditing" class="flex gap-2">
+            <Button @click="startEditing" variant="link" size="sm">Изменить</Button>
+            <AlertDialog>
+              <AlertDialogTrigger as-child>
+                <Button variant="ghost" size="sm" class="hover:text-destructive">
+                  <Trash2 :size="16" />
                 </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Вы уверены?</AlertDialogTitle>
+                  <AlertDialogDescription>Восстановить игру будет невозможно</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Отмена</AlertDialogCancel>
+                  <AlertDialogAction class="bg-destructive" @click="deleteGame">
+                    <Loader v-if="isDeleting" class="animate-spin" />
+                    <span v-else>Удалить</span>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+
+          <User v-if="!isAuthor && !loading" :user="game?.author" :size="9" name-field="email" />
+          <Skeleton v-if="loading" class="h-10" />
+        </div>
+      </CardHeader>
+
+      <CardContent class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Фото -->
+          <div>
+            <Skeleton v-if="loading" class="w-full h-64 rounded-lg" />
+            <div v-else-if="game?.photos?.length" class="relative">
+              <Carousel>
+                <CarouselContent>
+                  <CarouselItem v-for="(photo, idx) in game.photos" :key="idx">
+                    <img :src="getPhotoUrl(photo)" class="w-full h-64 object-cover rounded-lg" />
+                  </CarouselItem>
+                </CarouselContent>
+                <CarouselPrevious v-if="game.photos.length > 1" class="absolute left-2 top-1/2 -translate-y-1/2 h-7 w-7" />
+                <CarouselNext v-if="game.photos.length > 1" class="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7" />
+              </Carousel>
+            </div>
+            <div v-else class="flex justify-center items-center w-full h-64 bg-muted rounded-lg border">
+              <ImageIcon :size="48" class="text-muted-foreground" />
+              <p v-if="isEditing" class="text-sm ml-2">Фото нельзя изменить</p>
+            </div>
+          </div>
+
+          <!-- Параметры -->
+          <div class="md:col-span-2">
+            <div class="grid grid-cols-2 gap-4">
+              <template v-if="loading">
+                <Skeleton v-for="i in 8" :key="i" class="h-8" />
+              </template>
+
+              <template v-else>
+                <div class="space-y-1">
+                  <Label class="text-xs text-muted-foreground">Возраст</Label>
+                  <Input v-if="isEditing" v-model.number="form.age" type="number" :disabled="saving" />
+                  <p v-else class="text-sm font-medium">{{ game?.age }} лет</p>
+                </div>
+
+                <div class="space-y-1">
+                  <Label class="text-xs text-muted-foreground">Игроки</Label>
+                  <Input v-if="isEditing" v-model.number="form.players" type="number" :disabled="saving" />
+                  <p v-else class="text-sm font-medium">{{ game?.players }} чел</p>
+                </div>
+
+                <div class="space-y-1">
+                  <Label class="text-xs text-muted-foreground">Длительность</Label>
+                  <Input v-if="isEditing" v-model.number="form.duration" type="number" :disabled="saving" />
+                  <p v-else class="text-sm font-medium">{{ game?.duration }} мин</p>
+                </div>
+
+                <div class="space-y-1">
+                  <Label class="text-xs text-muted-foreground">Локация</Label>
+                  <Select v-if="isEditing" v-model="form.locationType" :disabled="saving">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Выберите" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem v-for="(value, key) in gameLocationTypes" :key="key" :value="key">
+                        {{ value }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p v-else class="text-sm font-medium">{{ gameLocationTypes[game?.locationType] }}</p>
+                </div>
+
+                <div class="space-y-1">
+                  <Label class="text-xs text-muted-foreground">Ширина площадки</Label>
+                  <Input v-if="isEditing" v-model.number="form.fieldWidth" type="number" :disabled="saving" />
+                  <p v-else class="text-sm font-medium">{{ game?.fieldWidth }} м</p>
+                </div>
+
+                <div class="space-y-1">
+                  <Label class="text-xs text-muted-foreground">Длина площадки</Label>
+                  <Input v-if="isEditing" v-model.number="form.fieldLength" type="number" :disabled="saving" />
+                  <p v-else class="text-sm font-medium">{{ game?.fieldLength }} м</p>
+                </div>
+
+                <div class="space-y-1">
+                  <Label class="text-xs text-muted-foreground">Активность</Label>
+                  <Select v-if="isEditing" v-model="form.activityLevel" :disabled="saving">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Выберите" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem v-for="(value, key) in activityLevels" :key="key" :value="key">
+                        {{ value }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p v-else class="text-sm font-medium">{{ activityLevels[game?.activityLevel] }}</p>
+                </div>
+
+                <div class="space-y-1">
+                  <Label class="text-xs text-muted-foreground">Статус</Label>
+                  <div v-if="isEditing" class="flex items-center gap-2 pt-1">
+                    <Checkbox v-model="form.isPublic" :disabled="saving" />
+                    <Label class="text-xs">Публичная игра</Label>
+                  </div>
+                  <Badge v-else :variant="game?.isPublic ? 'default' : 'secondary'" class="block w-fit">
+                    {{ game?.isPublic ? 'Публичная' : 'Черновик' }}
+                  </Badge>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <!-- Описание -->
+        <div class="space-y-1">
+          <Skeleton v-if="loading" class="h-20" />
+          <template v-else>
+            <Label class="text-xs text-muted-foreground">Описание</Label>
+            <Textarea v-if="isEditing" v-model="form.description" rows="3" :disabled="saving" placeholder="Описание игры" />
+            <p v-else class="text-sm">{{ game?.description || 'Нет описания' }}</p>
+          </template>
+        </div>
+
+        <!-- Реквизит -->
+        <div class="space-y-1">
+          <Skeleton v-if="loading" class="h-10" />
+          <template v-else>
+            <div class="flex items-center gap-2">
+              <Label class="text-xs text-muted-foreground">Реквизит</Label>
+              <Button v-if="isEditing" variant="outline" size="icon" class="h-7 w-7" @click="isAddingRequisit = !isAddingRequisit" :disabled="saving">
+                <Plus :size="14" />
+              </Button>
+            </div>
+
+            <div v-if="!isEditing && game?.requisites?.length" class="flex flex-wrap gap-2">
+              <Badge v-for="item in game.requisites" :key="item" variant="outline">{{ item }}</Badge>
+            </div>
+
+            <div v-if="isEditing" class="flex flex-wrap gap-2">
+              <Badge v-for="(item, idx) in form.requisites" :key="idx" variant="outline">
+                {{ item }}
+                <X :size="12" class="ml-1 cursor-pointer" @click="removeRequisite(idx)" />
+              </Badge>
+              <div v-if="isAddingRequisit" class="flex gap-2">
+                <Input v-model="newRequisite" class="w-40" placeholder="Название" @keyup.enter="addRequisite" />
+                <Button size="icon" class="h-7 w-7" @click="addRequisite"><Check :size="14" /></Button>
               </div>
+              <span v-if="!form.requisites.length && !isAddingRequisit" class="text-sm text-muted-foreground">Нет реквизита</span>
+            </div>
 
-              <div class="flex flex-wrap gap-2 mt-2 items-center">
-                <Badge
-                    v-for="(item, index) in form.requisites"
-                    :key="index"
-                    variant="outline"
-                >
-                  {{ item }}
-                  <Button
-                      variant="ghost"
-                      class="p-0.5 h-5 hover:text-destructive flex-shrink-0 ml-auto"
-                      @click="removeRequisite(index)"
-                      :disabled="saving"
-                  >
-                    <X :size="12"/>
-                  </Button>
-                </Badge>
+            <p v-if="!isEditing && !game?.requisites?.length" class="text-sm text-muted-foreground">Нет реквизита</p>
+          </template>
+        </div>
 
-                <template v-if="isAddingRequisit">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <Input
-                        v-model="newRequisite"
-                        placeholder="Название"
-                        class="w-40"
-                        @keyup.enter="addRequisite"
-                        :disabled="saving"
-                    />
-                    <Button size="xs" title="Сохранить" @click="addRequisite" :disabled="saving">
-                      <Check :size="16"/>
+        <!-- Стадии -->
+        <div v-if="!isEditing && !loading && game?.stages?.length" class="space-y-3">
+          <Label class="text-xs text-muted-foreground">Стадии игры ({{ game.stages.length }})</Label>
+          <div class="grid grid-cols-1 gap-3">
+            <Card v-for="stage in game.stages" :key="stage.id" class="p-3 md:p-5">
+              <CardHeader class="p-0">
+                <div class="flex items-start justify-between gap-4">
+                  <!-- Название: либо текст, либо инпут -->
+                  <CardTitle v-if="editingStageId !== stage.id" class="break-words pr-2">
+                    {{ stage.title }}
+                  </CardTitle>
+                  <Input v-else v-model="editingStageData.title" placeholder="Название стадии" class="flex-1" :disabled="savingStageId === stage.id" />
+
+                  <div class="flex items-center gap-1">
+                    <span class="text-sm text-muted-foreground">{{ stage.duration }} мин</span>
+
+                    <!-- Кнопки для просмотра -->
+                    <template v-if="editingStageId !== stage.id">
+                      <Button v-if="isAuthor" variant="ghost" size="icon" class="h-7 w-7" @click="startEditingStage(stage)">
+                        <Pencil :size="14" />
+                      </Button>
+                      <Button v-if="isAuthor" variant="ghost" size="icon" class="h-7 w-7 hover:text-destructive" @click="deleteStage(stage.id)">
+                        <Trash2 :size="14" />
+                      </Button>
+                    </template>
+
+                    <!-- Кнопки для редактирования -->
+                    <template v-else>
+                      <Button variant="ghost" size="icon" class="h-7 w-7 text-primary" @click="saveStageChanges(stage.id)" :disabled="savingStageId === stage.id">
+                        <Loader v-if="savingStageId === stage.id" class="w-4 h-4 animate-spin" />
+                        <Check v-else :size="14" />
+                      </Button>
+                      <Button variant="ghost" size="icon" class="h-7 w-7" @click="cancelEditingStage" :disabled="savingStageId === stage.id">
+                        <X :size="14" />
+                      </Button>
+                    </template>
+                  </div>
+                </div>
+
+                <!-- Описание: либо текст, либо textarea -->
+                <CardDescription v-if="editingStageId !== stage.id" class="break-words mt-2">
+                  {{ stage.description }}
+                </CardDescription>
+                <Textarea v-else v-model="editingStageData.description" placeholder="Описание стадии" rows="2" class="mt-2" :disabled="savingStageId === stage.id" />
+
+                <!-- Длительность: только в режиме редактирования -->
+                <div v-if="editingStageId === stage.id" class="flex items-center gap-2 mt-2">
+                  <Label class="text-sm">Длительность (мин)</Label>
+                  <Input v-model.number="editingStageData.duration" type="number" min="1" class="w-24" :disabled="savingStageId === stage.id" />
+                </div>
+              </CardHeader>
+
+              <CardContent class="p-0 pt-3 space-y-2">
+                <!-- Задания -->
+                <div class="space-y-1">
+                  <div class="flex items-center gap-2">
+                    <p class="text-xs font-medium text-muted-foreground">Задания:</p>
+                    <Button v-if="editingStageId === stage.id && isAuthor" variant="outline" size="icon" class="h-6 w-6" @click="addingTaskForStage = stage.id" :disabled="savingStageId === stage.id">
+                      <Plus :size="12" />
                     </Button>
                   </div>
-                </template>
 
-                <span v-if="!form.requisites.length && !isAddingRequisit" class="text-sm text-muted-foreground">
-                  Нет реквизита
-                </span>
-              </div>
-            </div>
+                  <!-- Список заданий (режим просмотра) -->
+                  <ul v-if="editingStageId !== stage.id && stage.tasks?.length" class="list-disc list-inside text-sm">
+                    <li v-for="task in stage.tasks" :key="task" class="break-words">{{ task }}</li>
+                  </ul>
 
-            <!-- Публичность -->
-            <div class="flex items-center gap-2">
-              <Checkbox v-model="form.isPublic" id="isPublic" :disabled="saving" />
-              <Label for="isPublic">Публичная игра</Label>
-            </div>
+                  <!-- Список заданий (режим редактирования) -->
+                  <div v-if="editingStageId === stage.id" class="space-y-1">
+                    <div v-for="(task, idx) in editingStageData.tasks" :key="idx" class="flex items-center gap-2 group">
+                      <span class="text-sm flex-1 break-words">• {{ task }}</span>
+                      <Button variant="ghost" size="icon" class="h-5 w-5" @click="removeStageTask(idx)" :disabled="savingStageId === stage.id">
+                        <X :size="12" />
+                      </Button>
+                    </div>
+                    <!-- Инпут добавления задания-->
+                    <div v-if="addingTaskForStage === stage.id" class="flex items-center gap-2 mt-1">
+                      <Input v-model="newStageTask" placeholder="Новое задание" class="flex-1" @keyup.enter="addStageTask" :disabled="savingStageId === stage.id" />
+                      <Button size="icon" class="h-7 w-7" @click="addStageTask" :disabled="savingStageId === stage.id">
+                        <Check :size="14" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
 
-            <!-- Кнопки действий -->
-            <div class="flex flex-col sm:flex-row justify-end gap-2 pt-4">
-              <Button variant="outline" @click="cancelEdit" class="w-full sm:w-auto" :disabled="saving">Отмена</Button>
-              <Button @click="saveChanges" :disabled="saving" class="w-full sm:w-auto">
-                <Loader v-if="saving" class="w-4 h-4 mr-2 animate-spin" />
-                Сохранить
-              </Button>
-            </div>
+                <!-- Реквизит этапа -->
+                <div class="space-y-1">
+                  <div class="flex items-center gap-2">
+                    <p class="text-xs font-medium text-muted-foreground">Реквизит этапа:</p>
+                    <Button v-if="editingStageId === stage.id && isAuthor" variant="outline" size="icon" class="h-6 w-6" @click="addingPropForStage = stage.id" :disabled="savingStageId === stage.id">
+                      <Plus :size="12" />
+                    </Button>
+                  </div>
+
+                  <!-- Список реквизита (режим просмотра) -->
+                  <div v-if="editingStageId !== stage.id && stage.props?.length" class="flex flex-wrap gap-1">
+                    <Badge v-for="prop in stage.props" :key="prop" variant="outline" class="text-xs">{{ prop }}</Badge>
+                  </div>
+
+                  <!-- Список реквизита (режим редактирования) -->
+                  <div v-if="editingStageId === stage.id" class="space-y-1">
+                    <div class="flex flex-wrap gap-1">
+                      <div v-for="(prop, idx) in editingStageData.props" :key="idx" class="flex items-center gap-1 bg-muted px-2 py-1 rounded-md text-sm group">
+                        <span class="break-all">{{ prop }}</span>
+                        <Button variant="ghost" class="p-0.5 h-5 w-5 hover:text-destructive" @click="removeStageProp(idx)" :disabled="savingStageId === stage.id">
+                          <X :size="12" />
+                        </Button>
+                      </div>
+                      <!-- Инпут добавления реквизита-->
+                      <div v-if="addingPropForStage === stage.id" class="flex items-center gap-2 mt-1">
+                        <Input v-model="newStageProp" placeholder="Новый реквизит" class="w-40" @keyup.enter="addStageProp" :disabled="savingStageId === stage.id" />
+                        <Button size="icon" class="h-7 w-7" @click="addStageProp" :disabled="savingStageId === stage.id">
+                          <Check :size="14" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+
+        <!-- Кнопки сохранения/отмены редактирования игры -->
+        <div v-if="isEditing" class="flex justify-end gap-2 pt-4">
+          <Button variant="outline" @click="cancelEdit">Отмена</Button>
+          <Button @click="saveChanges" :disabled="saving">
+            <Loader v-if="saving" class="w-4 h-4 mr-2 animate-spin" />
+            Сохранить
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   </div>
 </template>

@@ -1,5 +1,3 @@
-import {ModelType} from "./enums";
-
 export interface User {
     id?: number,
     name?: string,

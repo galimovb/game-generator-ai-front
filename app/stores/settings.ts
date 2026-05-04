@@ -1,5 +1,3 @@
-import type { UserSettings } from '~/types/user'
-
 export const useSettingsStore = defineStore('settings', () => {
     const { get, patch } = useApi()
     const { $toast } = useNuxtApp()
@@ -32,7 +30,7 @@ export const useSettingsStore = defineStore('settings', () => {
         states.loading = true
         states.error = null
         try {
-            const { result } = await patch('/users/profile/settiвувngs', data)
+            const { result } = await patch('/users/profile/settings', data)
             Object.assign(states.settings, result)
         } catch (err: any) {
             $toast.error('Ошибка обновления настроек', {

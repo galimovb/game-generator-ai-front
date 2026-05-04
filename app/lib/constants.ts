@@ -3,3 +3,10 @@ export const gameLocationTypes = {
     outdoor: 'На улице',
     both: 'Оба варианта'
 }
+
+export const activityLevels = {
+    low: 'Низкая',
+    medium: 'Средняя',
+    high: 'Высокая'
+}
+

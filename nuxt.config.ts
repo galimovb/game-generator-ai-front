@@ -17,7 +17,21 @@ export default defineNuxtConfig({
   vite: {
     plugins: [
         tailwindcss(),
-    ]
+    ],
+    server: {
+      proxy: {
+        '/api': {
+          target: 'http://82.202.139.222:8080',
+          changeOrigin: true,
+          secure: false,
+        },
+        '/photo': {
+          target: 'http://82.202.139.222:8080',
+          changeOrigin: true,
+          secure: false,
+        }
+      }
+    }
   },
 
   modules: ['shadcn-nuxt', '@pinia/nuxt', 'vue-sonner/nuxt'],

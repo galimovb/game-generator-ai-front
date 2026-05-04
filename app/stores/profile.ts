@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import type { UserProfile } from '~/types/user'
 
 export const useProfileStore = defineStore('profile', () => {
     const { get, patch } = useApi()

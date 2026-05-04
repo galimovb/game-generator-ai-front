@@ -1,12 +1,10 @@
 <script setup lang="ts">
 const showCreateDialog = ref(false)
 
-const { games, loading, incrementComments, decrementComments, toggleLike } = useGamesList({
+const { games, loading, incrementComments, decrementComments, toggleLike, refresh } = useGamesList({
   endpoint: '/games/my',
   key: 'my-games'
 })
-
-const loadGames = () => refresh()
 </script>
 
 <template>
@@ -31,7 +29,7 @@ const loadGames = () => refresh()
 
     <GameCreateDialog
         v-model:open="showCreateDialog"
-        @created="loadGames"
+        @created="refresh"
     />
   </div>
 </template>

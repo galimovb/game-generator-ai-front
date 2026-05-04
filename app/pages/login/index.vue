@@ -24,11 +24,9 @@ const handleSubmit = async () => {
       password: loginData.password
     })
 
-    await navigateTo('/')
+    await navigateTo('/games/my')
   } catch (err) {
-    $toast.error('Ошибка при входе',{
-      description: JSON.stringify(err)
-    })
+    $toast.error('Ошибка при входе')
     console.log('err', err.error)
     console.log('err', err.errorMessage)
   } finally {
@@ -86,11 +84,11 @@ const handleSubmit = async () => {
         </form>
       </CardContent>
       <CardFooter class="flex flex-col gap-2">
-        <div class="px-6 pb-2 text-center">или</div>
+<!--        <div class="px-6 pb-2 text-center">или</div>
         <Button variant="outline" class="w-full">
           Войти через
           <img src="~/assets/img/yandex-icon.png" class="w-5 h-5">
-        </Button>
+        </Button>-->
         <p class="text-sm text-muted-foreground">
           Нет аккаунта?
           <Button variant="link" class="px-0">

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Camera } from 'lucide-vue-next'
+import { Camera, Loader } from 'lucide-vue-next'
 
 defineProps<{
   open: boolean
@@ -13,28 +13,23 @@ const emit = defineEmits<{
 const { post } = useApi()
 const { $toast } = useNuxtApp()
 
-// Форма
 const form = ref({
-  minAge: 6,
-  maxAge: 12,
-  minPlayers: 4,
-  maxPlayers: 20,
+  age: 8,
+  players: 12,
   duration: 60,
   locationType: 'outdoor',
+  fieldWidth: 20,
+  fieldLength: 20,
+  activityLevel: 'medium',
   requisites: [] as string[],
   photos: [] as string[]
 })
 
-// Новый реквизит
 const newRequisite = ref('')
-
-// Фото
 const photoPreviews = ref<string[]>([])
 const uploadError = ref('')
-
 const isCreating = ref(false)
 
-// Добавление реквизита
 const addRequisite = () => {
   if (newRequisite.value.trim()) {
     form.value.requisites.push(newRequisite.value.trim())
@@ -42,12 +37,10 @@ const addRequisite = () => {
   }
 }
 
-// Удаление реквизита
 const removeRequisite = (index: number) => {
   form.value.requisites.splice(index, 1)
 }
 
-// Обработка фото
 const handlePhotoSelect = async (event: Event) => {
   const input = event.target as HTMLInputElement
   if (!input.files?.length) return
@@ -74,13 +67,11 @@ const handlePhotoSelect = async (event: Event) => {
   input.value = ''
 }
 
-// Удалить фото
 const removePhoto = (index: number) => {
   photoPreviews.value.splice(index, 1)
   form.value.photos.splice(index, 1)
 }
 
-// Создание игры
 const createGame = async () => {
   try {
     isCreating.value = true
@@ -88,9 +79,10 @@ const createGame = async () => {
     emit('created')
     resetForm()
     emit('update:open', false)
+    $toast.success('Игра успешно создана')
   } catch (error) {
     console.error('Ошибка создания игры:', error)
-    $toast.error('Ошибка создания игры',{
+    $toast.error('Ошибка создания игры', {
       action: {
         label: 'Повторить',
         onClick: () => createGame(),
@@ -101,15 +93,15 @@ const createGame = async () => {
   }
 }
 
-// Сброс формы
 const resetForm = () => {
   form.value = {
-    minAge: 6,
-    maxAge: 12,
-    minPlayers: 4,
-    maxPlayers: 20,
+    age: 8,
+    players: 12,
     duration: 60,
     locationType: 'outdoor',
+    fieldWidth: 20,
+    fieldLength: 20,
+    activityLevel: 'medium',
     requisites: [],
     photos: []
   }
@@ -118,8 +110,8 @@ const resetForm = () => {
   newRequisite.value = ''
 }
 
-// Закрытие
 const onClose = () => {
+  if (isCreating.value) return
   resetForm()
   emit('update:open', false)
 }
@@ -135,7 +127,6 @@ const onClose = () => {
         </DialogDescription>
       </DialogHeader>
 
-      <!-- Фото по середине вверху -->
       <div class="flex justify-center mb-6">
         <div class="flex flex-wrap gap-2 justify-center max-w-md">
           <div
@@ -163,55 +154,68 @@ const onClose = () => {
       <p v-if="uploadError" class="text-sm text-red-500 text-center mb-4">{{ uploadError }}</p>
 
       <div class="space-y-4 py-4">
-        <!-- Возраст -->
-        <div class="grid grid-cols-2 gap-4">
-          <div class="space-y-2">
-            <Label>Мин. возраст</Label>
-            <Input v-model.number="form.minAge" type="number" min="3" max="80" />
-          </div>
-          <div class="space-y-2">
-            <Label>Макс. возраст</Label>
-            <Input v-model.number="form.maxAge" type="number" min="3" max="80" />
-          </div>
+        <div class="space-y-2">
+          <Label>Возраст</Label>
+          <Input v-model.number="form.age" type="number" min="3" max="80" />
         </div>
 
-        <!-- Игроки -->
-        <div class="grid grid-cols-2 gap-4">
-          <div class="space-y-2">
-            <Label>Мин. игроков</Label>
-            <Input v-model.number="form.minPlayers" type="number" min="1" />
-          </div>
-          <div class="space-y-2">
-            <Label>Макс. игроков</Label>
-            <Input v-model.number="form.maxPlayers" type="number" min="1" />
-          </div>
+        <div class="space-y-2">
+          <Label>Количество игроков</Label>
+          <Input v-model.number="form.players" type="number" min="1" max="500" />
         </div>
 
-        <!-- Длительность -->
         <div class="space-y-2">
           <Label>Длительность (минут)</Label>
-          <Input v-model.number="form.duration" type="number" min="5" />
+          <Input v-model.number="form.duration" type="number" min="5" max="480" />
         </div>
 
-        <!-- Тип локации -->
         <div class="space-y-2">
           <Label>Тип локации</Label>
-          <Select v-model="form.locationType" :disabled="saving">
+          <Select v-model="form.locationType">
             <SelectTrigger>
               <SelectValue placeholder="Выберите тип" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem
                   v-for="(value, key) in gameLocationTypes"
+                  :key="key"
                   :value="key"
               >
-                {{value}}
+                {{ value }}
               </SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        <!-- Реквизит -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <Label>Ширина площадки (м)</Label>
+            <Input v-model.number="form.fieldWidth" type="number" min="1" max="1000" />
+          </div>
+          <div class="space-y-2">
+            <Label>Длина площадки (м)</Label>
+            <Input v-model.number="form.fieldLength" type="number" min="1" max="1000" />
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <Label>Уровень активности</Label>
+          <Select v-model="form.activityLevel">
+            <SelectTrigger>
+              <SelectValue placeholder="Выберите уровень" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem
+                  v-for="(value, key) in activityLevels"
+                  :key="key"
+                  :value="key"
+              >
+                {{ value }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <div class="space-y-2">
           <div class="flex justify-between items-center">
             <Label>Реквизит</Label>
@@ -228,7 +232,6 @@ const onClose = () => {
             </div>
           </div>
 
-          <!-- Список реквизита -->
           <div class="flex flex-wrap gap-2 mt-2">
             <div
                 v-for="(item, index) in form.requisites"
@@ -252,7 +255,10 @@ const onClose = () => {
 
       <DialogFooter>
         <Button variant="outline" :disabled="isCreating" @click="onClose">Отмена</Button>
-        <Button @click="createGame" :disabled="isCreating">Создать</Button>
+        <Button @click="createGame" :disabled="isCreating">
+          <Loader v-if="isCreating" :size="16" class="animate-spin" />
+          Создать
+        </Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>

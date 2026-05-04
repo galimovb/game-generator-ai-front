@@ -14,5 +14,16 @@
     {
       "path": "./.nuxt/tsconfig.node.json"
     }
+  ],
+  "extends": "./.nuxt/tsconfig.json",
+  "include": [
+    "nuxt.config.ts",
+    "app.vue",
+    "components/**/*",
+    "pages/**/*",
+    "plugins/**/*",
+    "composables/**/*",
+    "store/**/*",
+    "types/**/*"
   ]
 }

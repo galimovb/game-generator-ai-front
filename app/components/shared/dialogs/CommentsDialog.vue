@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Send, Loader, MessageCircle, Reply, X, MoreVertical, Trash2 } from 'lucide-vue-next'
-import type { GameComment } from '~/types/game'
 
 const props = defineProps<{
   gameId: number

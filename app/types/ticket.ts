@@ -1,6 +1,4 @@
-import type { User } from '~/types/user'
-
-interface Ticket {
+export interface Ticket {
     id: number
     subject: string
     description: string | null
@@ -13,7 +11,7 @@ interface Ticket {
     closedAt: string | null
 }
 
-interface TicketMessage {
+export interface TicketMessage {
     id: number
     text: string | null
     photos: string[] | null

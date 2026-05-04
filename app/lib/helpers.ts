@@ -1,6 +1,7 @@
 export const getPhotoUrl = (path: string):string => {
+    if(!path) return ''
     const config = useRuntimeConfig()
-    return `${config.public.apiBase}${path}`
+    return `/photo${path}`
 }
 
 export const getUserFullName = (author?: UserProfile | undefined):string => {

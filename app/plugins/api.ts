@@ -2,7 +2,7 @@ import { appendResponseHeader } from 'h3'
 
 export default defineNuxtPlugin(() => {
     const config = useRuntimeConfig()
-    const API_BASE = `${config.public.apiBase}/api`
+    const API_BASE = config.public.apiBase
     const headers = import.meta.server ? useRequestHeaders(['cookie']) : {}
     const event = import.meta.server ? useRequestEvent() : undefined
 

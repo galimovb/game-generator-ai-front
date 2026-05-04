@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Loader } from 'lucide-vue-next'
-import type { Game } from '~/types/game'
 
 defineProps<{
   games: Game[]
@@ -33,13 +32,13 @@ const handleLikeToggle = (gameId: number) => {
     <Loader class="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
   </div>
 
-  <div v-else-if="games.length === 0" class="text-center py-12">
+  <div v-else-if="games.length === 0" class="text-center">
     <p class="text-muted-foreground">
       {{ emptyText || 'Нет данных' }}
     </p>
   </div>
 
-  <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
     <GameListItem
         v-for="game in games"
         :key="game.id"

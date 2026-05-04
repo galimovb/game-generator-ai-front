@@ -21,7 +21,7 @@ export const useGamesList = (options: {
         },
         {
             watch: [page, options.query || ref({})],
-            server: true,
+            server: false,
             default: () => ({
                 result: {
                     items: [],
@@ -40,7 +40,7 @@ export const useGamesList = (options: {
             games.value = newData.result.items
             total.value = newData.result.pagination.total
         }
-    }, { immediate: true })
+    })
 
     const updateGameCommentsCount = (gameId: number, change: number) => {
         const index = games.value.findIndex(g => g.id === gameId)
