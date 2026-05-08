@@ -1,29 +1,29 @@
 <script setup lang="ts">
-const { fontSize, radius, color, isDarkTheme } = storeToRefs(useAppData())
+const { fontSize, radius, color, isDarkTheme } = storeToRefs(useAppData());
 useHead({
   htmlAttrs: {
-    class: isDarkTheme.value ? 'dark' : 'light',
-    'data-theme': color.value,
-    'data-radius': radius.value,
-    'data-font': fontSize.value
-  }
-})
+    class: isDarkTheme.value ? "dark" : "light",
+    "data-theme": color.value,
+    "data-radius": radius.value,
+    "data-font": fontSize.value,
+  },
+});
 
-const profileStore = useProfileStore()
-const settingsStore = useSettingsStore()
+const profileStore = useProfileStore();
+const settingsStore = useSettingsStore();
 
-const route = useRoute()
-const authPages = ['/login', '/register']
+const route = useRoute();
+const authPages = ["/login", "/register"];
 
 const isAuthPage = computed(() => {
-  return authPages.includes(route.path)
-})
+  return authPages.includes(route.path);
+});
 
 if (!isAuthPage.value) {
   await Promise.all([
     profileStore.fetchProfile(),
-    settingsStore.fetchSettings()
-  ])
+    settingsStore.fetchSettings(),
+  ]);
 }
 </script>
 

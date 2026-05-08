@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import { Loader } from 'lucide-vue-next'
+import { Loader } from "lucide-vue-next";
 
 defineProps<{
-  games: Game[]
-  loading: boolean
-  emptyText?: string
-  showActions?: boolean
-}>()
+  games: Game[];
+  loading: boolean;
+  emptyText?: string;
+  showActions?: boolean;
+}>();
 
 const emit = defineEmits<{
-  (e: 'comment:created', gameId: number): void
-  (e: 'comment:deleted', gameId: number): void
-  (e: 'like:toggle', gameId: number): void
-}>()
+  (e: "comment:created", gameId: number): void;
+  (e: "comment:deleted", gameId: number): void;
+  (e: "like:toggle", gameId: number): void;
+}>();
 
 const handleCommentCreated = (gameId: number) => {
-  emit('comment:created', gameId)
-}
+  emit("comment:created", gameId);
+};
 
 const handleCommentDeleted = (gameId: number) => {
-  emit('comment:deleted', gameId)
-}
+  emit("comment:deleted", gameId);
+};
 
 const handleLikeToggle = (gameId: number) => {
-  emit('like:toggle', gameId)
-}
+  emit("like:toggle", gameId);
+};
 </script>
 
 <template>
@@ -34,19 +34,22 @@ const handleLikeToggle = (gameId: number) => {
 
   <div v-else-if="games.length === 0" class="text-center">
     <p class="text-muted-foreground">
-      {{ emptyText || 'Нет данных' }}
+      {{ emptyText || "Нет данных" }}
     </p>
   </div>
 
-  <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
+  <div
+    v-else
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3"
+  >
     <GameListItem
-        v-for="game in games"
-        :key="game.id"
-        :game="game"
-        :show-actions="showActions"
-        @comment:created="handleCommentCreated"
-        @comment:deleted="handleCommentDeleted"
-        @like:toggle="handleLikeToggle"
+      v-for="game in games"
+      :key="game.id"
+      :game="game"
+      :show-actions="showActions"
+      @comment:created="handleCommentCreated"
+      @comment:deleted="handleCommentDeleted"
+      @like:toggle="handleLikeToggle"
     />
   </div>
 </template>

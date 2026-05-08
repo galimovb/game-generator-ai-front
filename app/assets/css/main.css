@@ -86,22 +86,44 @@
 }
 
 /* Настройки размера шрифта */
-:root[data-font='13'] { font-size: 13px; }
-:root[data-font='14'] { font-size: 14px; }
-:root[data-font='15'] { font-size: 15px; }
-:root[data-font='17'] { font-size: 17px; }
-:root[data-font='18'] { font-size: 18px; }
-:root[data-font='19'] { font-size: 19px; }
-:root[data-font='20'] { font-size: 20px; }
+:root[data-font="13"] {
+  font-size: 13px;
+}
+:root[data-font="14"] {
+  font-size: 14px;
+}
+:root[data-font="15"] {
+  font-size: 15px;
+}
+:root[data-font="17"] {
+  font-size: 17px;
+}
+:root[data-font="18"] {
+  font-size: 18px;
+}
+:root[data-font="19"] {
+  font-size: 19px;
+}
+:root[data-font="20"] {
+  font-size: 20px;
+}
 
 /* Настройки радиуса */
-:root[data-radius='0'] { --radius: 0rem; }
-:root[data-radius='0.25'] { --radius: 0.25rem; }
-:root[data-radius='0.75'] { --radius: 0.75rem; }
-:root[data-radius='1'] { --radius: 1rem; }
+:root[data-radius="0"] {
+  --radius: 0rem;
+}
+:root[data-radius="0.25"] {
+  --radius: 0.25rem;
+}
+:root[data-radius="0.75"] {
+  --radius: 0.75rem;
+}
+:root[data-radius="1"] {
+  --radius: 1rem;
+}
 
 /* Цветовые схемы */
-.light[data-theme='gray'] {
+.light[data-theme="gray"] {
   --background: 0 0% 100%;
   --foreground: 224 71.4% 4.1%;
   --card: 0 0% 100%;
@@ -129,7 +151,7 @@
   --sidebar-ring: 224 71% 20%;
 }
 
-.dark[data-theme='gray'] {
+.dark[data-theme="gray"] {
   --background: 224 71.4% 4.1%;
   --foreground: 210 20% 98%;
   --card: 224 71.4% 4.1%;
@@ -157,7 +179,7 @@
   --sidebar-ring: 210 20% 70%;
 }
 
-.light[data-theme='zinc'] {
+.light[data-theme="zinc"] {
   --background: 0 0% 100%;
   --foreground: 240 10% 3.9%;
   --card: 0 0% 100%;
@@ -185,7 +207,7 @@
   --sidebar-ring: 240 6% 30%;
 }
 
-.dark[data-theme='zinc'] {
+.dark[data-theme="zinc"] {
   --background: 240 10% 3.9%;
   --foreground: 0 0% 98%;
   --card: 240 10% 3.9%;
@@ -213,7 +235,7 @@
   --sidebar-ring: 240 6% 70%;
 }
 
-.light[data-theme='rose'] {
+.light[data-theme="rose"] {
   --background: 0 0% 100%;
   --foreground: 240 10% 3.9%;
   --card: 0 0% 100%;
@@ -241,7 +263,7 @@
   --sidebar-ring: 346 77% 50%;
 }
 
-.dark[data-theme='rose'] {
+.dark[data-theme="rose"] {
   --background: 20 14.3% 4.1%;
   --foreground: 0 0% 95%;
   --card: 24 9.8% 10%;
@@ -269,7 +291,7 @@
   --sidebar-ring: 346 77% 60%;
 }
 
-.light[data-theme='blue'] {
+.light[data-theme="blue"] {
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
   --card: 0 0% 100%;
@@ -297,7 +319,7 @@
   --sidebar-ring: 221 83% 53%;
 }
 
-.dark[data-theme='blue'] {
+.dark[data-theme="blue"] {
   --background: 222.2 84% 4.9%;
   --foreground: 210 40% 98%;
   --card: 222.2 84% 4.9%;
@@ -325,7 +347,7 @@
   --sidebar-ring: 217 91% 60%;
 }
 
-.light[data-theme='green'] {
+.light[data-theme="green"] {
   --background: 0 0% 100%;
   --foreground: 240 10% 3.9%;
   --card: 0 0% 100%;
@@ -353,7 +375,7 @@
   --sidebar-ring: 142 76% 36%;
 }
 
-.dark[data-theme='green'] {
+.dark[data-theme="green"] {
   --background: 20 14.3% 4.1%;
   --foreground: 0 0% 95%;
   --card: 24 9.8% 10%;
@@ -381,7 +403,7 @@
   --sidebar-ring: 142 70% 45%;
 }
 
-.light[data-theme='orange'] {
+.light[data-theme="orange"] {
   --background: 0 0% 100%;
   --foreground: 20 14.3% 4.1%;
   --card: 0 0% 100%;
@@ -409,7 +431,7 @@
   --sidebar-ring: 25 95% 53%;
 }
 
-.dark[data-theme='orange'] {
+.dark[data-theme="orange"] {
   --background: 20 14.3% 4.1%;
   --foreground: 60 9.1% 97.8%;
   --card: 20 14.3% 4.1%;
@@ -435,10 +457,9 @@
   --sidebar-accent-foreground: 0 0% 96%;
   --sidebar-border: 25 20% 20%;
   --sidebar-ring: 20 90% 48%;
-
 }
 
-.light[data-theme='purple'] {
+.light[data-theme="purple"] {
   --background: 0 0% 100%;
   --foreground: 224 71.4% 4.1%;
   --card: 0 0% 100%;
@@ -466,7 +487,7 @@
   --sidebar-ring: 262 83% 58%;
 }
 
-.dark[data-theme='purple'] {
+.dark[data-theme="purple"] {
   --background: 224 71.4% 4.1%;
   --foreground: 210 20% 98%;
   --card: 224 71.4% 4.1%;
@@ -494,7 +515,7 @@
   --sidebar-ring: 263 70% 50%;
 }
 
-.light[data-theme='sky'] {
+.light[data-theme="sky"] {
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
   --card: 0 0% 100%;
@@ -522,7 +543,7 @@
   --sidebar-ring: 200 90% 50%;
 }
 
-.dark[data-theme='sky'] {
+.dark[data-theme="sky"] {
   --background: 222.2 84% 4.9%;
   --foreground: 210 40% 98%;
   --card: 222.2 84% 4.9%;
@@ -593,7 +614,8 @@
     @apply border-border;
   }
 
-  html, body {
+  html,
+  body {
     @apply h-full;
   }
 

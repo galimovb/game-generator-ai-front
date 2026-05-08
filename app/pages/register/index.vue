@@ -1,170 +1,199 @@
 <script setup lang="ts">
-import { Loader } from 'lucide-vue-next'
+import { Loader } from "lucide-vue-next";
+import { toTypedSchema } from "@vee-validate/zod";
+import * as z from "zod";
+import { useForm } from "vee-validate";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "~/components/ui/form";
 
 definePageMeta({
-  layout: 'auth'
-})
+  layout: "auth",
+});
 
-const { post } = useApi()
-const { $toast } = useNuxtApp()
-const router = useRouter()
+const { post } = useApi();
+const { $toast } = useNuxtApp();
+const router = useRouter();
 
-// Состояние формы регистрации
-const registerData = reactive<UserRegister>({
-  email: '',
-  login: '',
-  password: '',
-  name: '',
-  lastName: '',
-  middleName: ''
-})
+const registerSchema = toTypedSchema(
+  z.object({
+    email: z
+      .string()
+      .min(1, "Обязательное поле")
+      .email("Введите корректный email"),
+    password: z
+      .string()
+      .min(1, "Обязательное поле")
+      .min(8, "Минимум 8 символов"),
+    login: z
+      .string()
+      .max(255, "Максимум 255 символов")
+      .optional()
+      .or(z.literal("")),
+    name: z
+      .string()
+      .max(255, "Максимум 255 символов")
+      .optional()
+      .or(z.literal("")),
+    lastName: z
+      .string()
+      .max(255, "Максимум 255 символов")
+      .optional()
+      .or(z.literal("")),
+    middleName: z
+      .string()
+      .max(255, "Максимум 255 символов")
+      .optional()
+      .or(z.literal("")),
+  }),
+);
 
-const loading = ref(false)
-const error = ref('')
+const { handleSubmit } = useForm({
+  validationSchema: registerSchema,
+  initialValues: {
+    email: "",
+    password: "",
+    login: "",
+    name: "",
+    lastName: "",
+    middleName: "",
+  },
+});
 
-// Валидация
-const isFormValid = computed(() => {
-  return registerData.email.includes('@') &&
-      registerData.password.length >= 6
-})
+const loading = ref(false);
 
-const handleSubmit = async () => {
-  if (!isFormValid.value) {
-    error.value = 'Проверьте правильность заполнения полей'
-    return
-  }
-
-  loading.value = true
-  error.value = ''
+const onSubmit = handleSubmit(async (formValues) => {
+  loading.value = true;
 
   try {
-    await post('/auth/register', registerData)
-    await router.push('/login')
-  } catch (err: any) {
-    error.value = err.data?.message || 'Ошибка при регистрации'
-    $toast.error('Ошибка при регистрации')
-  } finally {
-    loading.value = false
-  }
-}
+    const body: Record<string, string> = {
+      email: formValues.email,
+      password: formValues.password,
+    };
+    if (formValues.login) body.login = formValues.login;
+    if (formValues.name) body.name = formValues.name;
+    if (formValues.lastName) body.lastName = formValues.lastName;
+    if (formValues.middleName) body.middleName = formValues.middleName;
 
-// Очистка ошибки при вводе
-watch([() => registerData.email, () => registerData.password, () => registerData.login], () => {
-  error.value = ''
-})
+    await post("/auth/register", body);
+    await router.push("/login");
+  } catch (err: any) {
+    $toast.error("Ошибка при регистрации");
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
 
 <template>
   <div class="flex items-center justify-center min-h-screen">
-    <Card class="w-full max-w-md shadow-lg">
-      <!-- Шапка -->
+    <Card class="w-full max-w-md">
       <CardHeader class="text-center">
         <CardTitle class="text-2xl font-bold">Регистрация</CardTitle>
-        <CardDescription>
-          Создайте новый аккаунт
-        </CardDescription>
+        <CardDescription>Создайте новый аккаунт</CardDescription>
       </CardHeader>
 
       <CardContent>
-        <form @submit.prevent="handleSubmit" class="space-y-2">
-          <!-- Email -->
-          <div class="space-y-2">
-            <Label for="email" class="font-medium">Email</Label>
-            <Input
-                id="email"
-                v-model="registerData.email"
-                type="email"
-                placeholder="ivan@example.com"
-                required
-            />
-          </div>
+        <form @submit.prevent="onSubmit" class="space-y-4">
+          <FormField v-slot="{ componentField }" name="email">
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input
+                  v-bind="componentField"
+                  type="email"
+                  placeholder="ivan@example.com"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
 
-          <!-- Логин -->
-          <div class="space-y-2">
-            <Label for="login" class="font-medium">Логин</Label>
-            <Input
-                id="login"
-                v-model="registerData.login"
-                type="text"
-                placeholder="ivan123"
-            />
-          </div>
+          <FormField v-slot="{ componentField }" name="login">
+            <FormItem>
+              <FormLabel>Логин</FormLabel>
+              <FormControl>
+                <Input
+                  v-bind="componentField"
+                  type="text"
+                  placeholder="ivan123"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
 
-          <!-- Пароль -->
-          <div class="space-y-2">
-            <Label for="password" class="font-medium">Пароль</Label>
-            <Input
-                id="password"
-                v-model="registerData.password"
-                type="password"
-                placeholder="••••••••"
-                required
-            />
-            <p class="text-xs text-gray-500">
-              Минимум 6 символов
-            </p>
-          </div>
+          <FormField v-slot="{ componentField }" name="password">
+            <FormItem>
+              <FormLabel>Пароль</FormLabel>
+              <FormControl>
+                <Input
+                  v-bind="componentField"
+                  type="password"
+                  placeholder="••••••••"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
 
-          <!-- Имя (опционально) -->
-          <div class="space-y-2">
-            <Label for="name" class="font-medium">Имя</Label>
-            <Input
-                id="name"
-                v-model="registerData.name"
-                type="text"
-                placeholder="Иван"
-            />
-          </div>
+          <FormField v-slot="{ componentField }" name="name">
+            <FormItem>
+              <FormLabel>Имя</FormLabel>
+              <FormControl>
+                <Input v-bind="componentField" type="text" placeholder="Иван" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
 
-          <!-- Фамилия (опционально) -->
-          <div class="space-y-2">
-            <Label for="lastName" class="font-medium">Фамилия</Label>
-            <Input
-                id="lastName"
-                v-model="registerData.lastName"
-                type="text"
-                placeholder="Иванов"
-            />
-          </div>
+          <FormField v-slot="{ componentField }" name="lastName">
+            <FormItem>
+              <FormLabel>Фамилия</FormLabel>
+              <FormControl>
+                <Input
+                  v-bind="componentField"
+                  type="text"
+                  placeholder="Иванов"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
 
-          <!-- Отчество (опционально) -->
-          <div class="space-y-2">
-            <Label for="middleName" class="font-medium">Отчество</Label>
-            <Input
-                id="middleName"
-                v-model="registerData.middleName"
-                type="text"
-                placeholder="Иванович"
-            />
-          </div>
+          <FormField v-slot="{ componentField }" name="middleName">
+            <FormItem>
+              <FormLabel>Отчество</FormLabel>
+              <FormControl>
+                <Input
+                  v-bind="componentField"
+                  type="text"
+                  placeholder="Иванович"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
 
-          <Button
-              type="submit"
-              class="w-full"
-              :disabled="loading || !isFormValid"
-          >
+          <Button type="submit" class="w-full" :disabled="loading">
             <Loader v-if="loading" class="animate-spin mr-2" :size="16" />
-            {{ loading ? 'Регистрация...' : 'Зарегистрироваться' }}
+            {{ loading ? "Регистрация..." : "Зарегистрироваться" }}
           </Button>
         </form>
       </CardContent>
 
-      <!-- Ссылка на логин -->
       <CardFooter class="justify-center pb-6">
         <p class="text-sm text-muted-foreground">
           Уже есть аккаунт?
           <Button variant="link" class="px-0">
-            <NuxtLink
-                to="/login"
-            >
-              Войти
-            </NuxtLink>
+            <NuxtLink to="/login">Войти</NuxtLink>
           </Button>
         </p>
       </CardFooter>
     </Card>
   </div>
 </template>
-
-<style scoped>
-</style>

@@ -1,71 +1,70 @@
 <script setup lang="ts">
-import { Loader2, Send, AlertCircle, Plus } from 'lucide-vue-next'
+import { Loader2, Send, AlertCircle, Plus } from "lucide-vue-next";
+import { toTypedSchema } from "@vee-validate/zod";
+import * as z from "zod";
+import { useForm } from "vee-validate";
 
 const emit = defineEmits<{
-  success: [ticket: any]
-}>()
+  success: [ticket: any];
+}>();
 
-const { $toast } = useNuxtApp()
+const { $toast } = useNuxtApp();
 
-const open = ref<boolean>(false)
-const loading = ref<boolean>(false)
-const error = ref<string | null>(null)
+const open = ref(false);
+const loading = ref(false);
 
-const formData = ref({
-  subject: '',
-  description: ''
-})
+const ticketSchema = toTypedSchema(
+  z.object({
+    subject: z
+      .string({ message: "Обязательное поле" })
+      .min(1, "Введите тему")
+      .max(255, "Максимум 255 символов"),
+    description: z
+      .string({ message: "Обязательное поле" })
+      .min(1, "Введите описание")
+      .max(5000, "Максимум 5000 символов"),
+  }),
+);
 
-const isFormValid = computed<boolean>(() => {
-  return formData.value.subject.trim().length > 0 &&
-      formData.value.description.trim().length > 0
-})
+const { handleSubmit, resetForm } = useForm({
+  validationSchema: ticketSchema,
+  initialValues: {
+    subject: "",
+    description: "",
+  },
+});
 
-const resetForm = ():void => {
-  formData.value = {
-    subject: '',
-    description: ''
-  }
-  error.value = null
-}
-
-const createTicket = async ():Promise<void> => {
-  if (!isFormValid.value) return
-
-  loading.value = true
-  error.value = null
+const onSubmit = handleSubmit(async (formValues) => {
+  loading.value = true;
 
   try {
-    const api = useApi()
+    const api = useApi();
 
-    // 1. Создаем тикет
-    const ticketResponse = await api.post('/tickets', {
-      subject: formData.value.subject,
-      description: formData.value.description
-    })
+    const ticketResponse = await api.post("/tickets", {
+      subject: formValues.subject,
+      description: formValues.description,
+    });
 
-    const ticket = ticketResponse.data
+    const ticket = ticketResponse.data;
 
-    // 2. Создаем сообщение в тикете с описанием проблемы
     await api.post(`/tickets/${ticket.id}/messages`, {
-      text: formData.value.description
-    })
+      text: formValues.description,
+    });
 
-    emit('success', ticket)
-    open.value = false
-    resetForm()
-
+    emit("success", ticket);
+    open.value = false;
+    resetForm();
   } catch (err: any) {
-    $toast.error('Ошибка при создании тикета',{
+    $toast.error("Ошибка при создании тикета", {
       action: {
-        label: 'Повторить',
-        onClick: () => createTicket(),
+        label: "Повторить",
+        onClick: () => onSubmit(),
       },
-    })
+    });
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+});
 </script>
 
 <template>
@@ -80,57 +79,67 @@ const createTicket = async ():Promise<void> => {
         <DialogHeader>
           <DialogTitle>Создание обращения</DialogTitle>
           <DialogDescription>
-            Опишите вашу проблему. Сотрудник поддержки свяжется с вами в ближайшее время.
+            Опишите вашу проблему. Сотрудник поддержки свяжется с вами в
+            ближайшее время.
           </DialogDescription>
         </DialogHeader>
 
-        <div class="space-y-4 py-4">
-          <Alert v-if="error" variant="destructive">
-            <AlertCircle :size="16" />
-            <AlertTitle>Ошибка</AlertTitle>
-            <AlertDescription>{{ error }}</AlertDescription>
-          </Alert>
+        <form @submit.prevent="onSubmit" class="space-y-4 py-4">
+          <FormField v-slot="{ componentField }" name="subject">
+            <FormItem>
+              <FormLabel>Тема обращения</FormLabel>
+              <FormControl>
+                <Input
+                  v-bind="componentField"
+                  placeholder="Кратко опишите суть проблемы"
+                  :disabled="loading"
+                  maxlength="255"
+                />
+              </FormControl>
+              <FormDescription
+                >{{ (componentField.modelValue || "").length }}/255
+                символов</FormDescription
+              >
+              <FormMessage />
+            </FormItem>
+          </FormField>
 
-          <div class="space-y-2">
-            <Label for="subject">Тема обращения</Label>
-            <Input
-                id="subject"
-                v-model="formData.subject"
-                placeholder="Кратко опишите суть проблемы"
-                :disabled="loading"
-                maxlength="255"
-            />
-            <p class="text-xs text-muted-foreground">
-              {{ formData.subject.length }}/255 символов
-            </p>
-          </div>
+          <FormField v-slot="{ componentField }" name="description">
+            <FormItem>
+              <FormLabel>Описание проблемы</FormLabel>
+              <FormControl>
+                <Textarea
+                  v-bind="componentField"
+                  placeholder="Подробно опишите ситуацию..."
+                  :disabled="loading"
+                  rows="5"
+                  maxlength="5000"
+                />
+              </FormControl>
+              <FormDescription
+                >{{ (componentField.modelValue || "").length }}/5000
+                символов</FormDescription
+              >
+              <FormMessage />
+            </FormItem>
+          </FormField>
 
-          <div class="space-y-2">
-            <Label for="description">Описание проблемы</Label>
-            <Textarea
-                id="description"
-                v-model="formData.description"
-                placeholder="Подробно опишите ситуацию..."
-                :disabled="loading"
-                rows="5"
-                maxlength="5000"
-            />
-            <p class="text-xs text-muted-foreground">
-              {{ formData.description.length }}/5000 символов
-            </p>
-          </div>
-        </div>
-
-        <DialogFooter>
-          <Button variant="outline" @click="open = false" :disabled="loading">
-            Отмена
-          </Button>
-          <Button @click="createTicket" :disabled="!isFormValid || loading">
-            <Loader2 v-if="loading" :size="16" class="mr-2 animate-spin" />
-            <Send v-else :size="16" class="mr-2" />
-            Отправить
-          </Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              @click="open = false"
+              :disabled="loading"
+            >
+              Отмена
+            </Button>
+            <Button type="submit" :disabled="loading">
+              <Loader2 v-if="loading" :size="16" class="mr-2 animate-spin" />
+              <Send v-else :size="16" class="mr-2" />
+              Отправить
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   </div>

@@ -1,38 +1,59 @@
 <script setup lang="ts">
-import { Loader } from 'lucide-vue-next'
+import { Loader } from "lucide-vue-next";
+import { toTypedSchema } from "@vee-validate/zod";
+import * as z from "zod";
+import { useForm } from "vee-validate";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "~/components/ui/form";
 
 definePageMeta({
-  layout: 'auth'
-})
+  layout: "auth",
+});
 
-const { $toast } = useNuxtApp()
+const { $toast } = useNuxtApp();
+const { post } = useApi();
 
-const { post } = useApi()
+const loginSchema = toTypedSchema(
+  z.object({
+    email: z
+      .string()
+      .min(1, "Обязательное поле")
+      .email("Введите корректный email"),
+    password: z.string().min(1, "Обязательное поле"),
+  }),
+);
 
-const loginData = reactive<UserLogin>({
-  email: '',
-  password: ''
-})
-const loading = ref(false)
+const { handleSubmit } = useForm({
+  validationSchema: loginSchema,
+  initialValues: {
+    email: "",
+    password: "",
+  },
+});
 
-const handleSubmit = async () => {
-  loading.value = true
+const loading = ref(false);
+
+const onSubmit = handleSubmit(async (formValues) => {
+  loading.value = true;
 
   try {
-    await post('/auth/login', {
-      email: loginData.email,
-      password: loginData.password
-    })
+    await post("/auth/login", {
+      email: formValues.email,
+      password: formValues.password,
+    });
 
-    await navigateTo('/games/my')
+    await navigateTo("/games/my");
   } catch (err) {
-    $toast.error('Ошибка при входе')
-    console.log('err', err.error)
-    console.log('err', err.errorMessage)
+    $toast.error("Ошибка при входе");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+});
 </script>
 
 <template>
@@ -42,61 +63,46 @@ const handleSubmit = async () => {
         <CardTitle class="text-center">Войти</CardTitle>
       </CardHeader>
       <CardContent class="pb-2">
-        <form @submit.prevent="handleSubmit">
-          <div class="grid w-full items-center gap-4">
-            <div class="flex flex-col space-y-1.5">
-              <Label for="email">Почта</Label>
-              <Input
-                  id="email"
-                  v-model="loginData.email"
+        <form @submit.prevent="onSubmit" class="space-y-2">
+          <FormField v-slot="{ componentField }" name="email">
+            <FormItem>
+              <FormLabel>Почта</FormLabel>
+              <FormControl>
+                <Input
+                  v-bind="componentField"
                   type="email"
                   placeholder="m@example.com"
-                  required
-              />
-            </div>
-            <div class="flex flex-col space-y-1.5">
-              <div class="flex items-center">
-                <Label for="password">Пароль</Label>
-                <a
-                    href="#"
-                    class="ml-auto inline-block text-sm underline"
-                >
-                  Забыли пароль?
-                </a>
-              </div>
-              <Input
-                  id="password"
-                  v-model="loginData.password"
-                  type="password"
-                  required
-              />
-            </div>
-          </div>
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
 
-          <Button
-              type="submit"
-              class="w-full mt-4"
-              :disabled="loading"
-          >
-            <Loader v-if="loading" class="animate-spin mr-2"/>
+          <FormField v-slot="{ componentField }" name="password">
+            <FormItem>
+              <div class="flex items-center">
+                <FormLabel>Пароль</FormLabel>
+                <a href="#" class="ml-auto inline-block text-sm underline"
+                  >Забыли пароль?</a
+                >
+              </div>
+              <FormControl>
+                <Input v-bind="componentField" type="password" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <Button type="submit" class="w-full mt-4" :disabled="loading">
+            <Loader v-if="loading" class="animate-spin mr-2" />
             Войти
           </Button>
         </form>
       </CardContent>
       <CardFooter class="flex flex-col gap-2">
-<!--        <div class="px-6 pb-2 text-center">или</div>
-        <Button variant="outline" class="w-full">
-          Войти через
-          <img src="~/assets/img/yandex-icon.png" class="w-5 h-5">
-        </Button>-->
         <p class="text-sm text-muted-foreground">
           Нет аккаунта?
           <Button variant="link" class="px-0">
-            <NuxtLink
-                to="/register"
-            >
-              Регистрация
-            </NuxtLink>
+            <NuxtLink to="/register">Регистрация</NuxtLink>
           </Button>
         </p>
       </CardFooter>
