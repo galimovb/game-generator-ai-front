@@ -1,15 +1,6 @@
 <script setup lang="ts">
-import {
-  MessageSquare,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  Send,
-  ArrowLeft,
-  Loader2,
-  Paperclip,
-  X,
-} from "lucide-vue-next";
+import { Send, ArrowLeft, Loader2, Paperclip, X } from "lucide-vue-next";
+import { ticketStatusConfig } from "~/lib/tickets";
 
 const router = useRouter();
 const route = useRoute();
@@ -54,33 +45,7 @@ const messagesCache = ref<
   >
 >(new Map());
 
-const statusConfig = {
-  open: {
-    label: "Открыт",
-    icon: AlertCircle,
-    variant: "default" as const,
-  },
-  in_progress: {
-    label: "В работе",
-    icon: Clock,
-    variant: "secondary" as const,
-  },
-  waiting_for_user: {
-    label: "Ожидает ответа",
-    icon: MessageSquare,
-    variant: "outline" as const,
-  },
-  resolved: {
-    label: "Решен",
-    icon: CheckCircle2,
-    variant: "success" as const,
-  },
-  closed: {
-    label: "Закрыт",
-    icon: CheckCircle2,
-    variant: "secondary" as const,
-  },
-};
+const statusConfig = ticketStatusConfig;
 
 const {
   data: tickets,

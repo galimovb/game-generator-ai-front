@@ -17,6 +17,7 @@ definePageMeta({
 
 const { $toast } = useNuxtApp();
 const { post } = useApi();
+const profileStore = useProfileStore();
 
 const loginSchema = toTypedSchema(
   z.object({
@@ -47,7 +48,11 @@ const onSubmit = handleSubmit(async (formValues) => {
       password: formValues.password,
     });
 
-    await navigateTo("/games/my");
+    await profileStore.fetchProfile();
+    const isAdminOrSupport = profileStore.profile?.roles.some(
+      (role) => role === "ROLE_ADMIN" || role === "ROLE_SUPPORT",
+    );
+    await navigateTo(isAdminOrSupport ? "/admin" : "/games/my");
   } catch (err) {
     $toast.error("Ошибка при входе");
   } finally {

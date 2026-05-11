@@ -12,14 +12,14 @@ export interface User {
   isVerified: boolean;
   password?: string;
 }
-type UserRole = "ROLE_USER" | "ROLE_ADMIN" | "ROLE_SUPPORT";
+export type UserRole = "ROLE_USER" | "ROLE_ADMIN" | "ROLE_SUPPORT";
 
 export type UserLogin = Required<Pick<User, "email" | "password">>;
 export type UserRegister = Omit<
   User,
   "id" | "roles" | "isActive" | "isBlocked" | "isVerified" | "avatar"
 >;
-export type UserProfile = Omit<User, "password" | "roles">;
+export type UserProfile = Omit<User, "password">;
 
 export interface UserSettings {
   generationModel: ModelType;
