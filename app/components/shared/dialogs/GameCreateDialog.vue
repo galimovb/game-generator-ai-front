@@ -62,7 +62,7 @@ const gameSchema = toTypedSchema(
           code: z.ZodIssueCode.custom,
           path: ["locationDescription"],
           message:
-            "Когда фото отсутствуют, обязательно укажите описание местности",
+            "Если вы не прикрепили фото местности, обязательно укажите описание местности для учета ландшафта",
         });
       }
     }),
@@ -238,10 +238,6 @@ const onClose = () => {
           </div>
         </div>
 
-        <p v-if="uploadError" class="text-sm text-destructive text-center mb-4">
-          {{ uploadError }}
-        </p>
-
         <!-- Возраст и игроки -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField v-slot="{ componentField }" name="age">
@@ -275,21 +271,46 @@ const onClose = () => {
           </FormField>
         </div>
 
-        <!-- Длительность -->
-        <FormField v-slot="{ componentField }" name="duration">
-          <FormItem>
-            <FormLabel>Длительность (минут)</FormLabel>
-            <FormControl>
-              <Input
-                v-bind="componentField"
-                type="number"
-                :min="5"
-                :max="480"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Уровень активности -->
+          <FormField v-slot="{ componentField }" name="activityLevel">
+            <FormItem>
+              <FormLabel>Уровень активности</FormLabel>
+              <Select v-bind="componentField">
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Выберите уровень" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem
+                      v-for="(value, key) in activityLevels"
+                      :key="key"
+                      :value="key"
+                  >
+                    {{ value }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <!-- Длительность -->
+          <FormField v-slot="{ componentField }" name="duration">
+            <FormItem>
+              <FormLabel>Длительность (минут)</FormLabel>
+              <FormControl>
+                <Input
+                    v-bind="componentField"
+                    type="number"
+                    :min="5"
+                    :max="480"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
 
         <!-- Тип локации -->
         <FormField v-slot="{ componentField }" name="locationType">
@@ -348,30 +369,6 @@ const onClose = () => {
           </FormField>
         </div>
 
-        <!-- Уровень активности -->
-        <FormField v-slot="{ componentField }" name="activityLevel">
-          <FormItem>
-            <FormLabel>Уровень активности</FormLabel>
-            <Select v-bind="componentField">
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Выберите уровень" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem
-                  v-for="(value, key) in activityLevels"
-                  :key="key"
-                  :value="key"
-                >
-                  {{ value }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
         <!-- Описание локации -->
         <FormField v-slot="{ componentField }" name="locationDescription">
           <FormItem>
@@ -380,14 +377,10 @@ const onClose = () => {
               <Textarea
                 v-bind="componentField"
                 rows="3"
-                placeholder="Опишите место проведения игры (минимум 10 символов)..."
+                placeholder="Опишите место проведения игры"
               />
             </FormControl>
-            <FormDescription
-              >Если не прикрепляете фото, опишите локацию для более точной
-              генерации</FormDescription
-            >
-            <FormMessage />
+            <FormMessage/>
           </FormItem>
         </FormField>
 
