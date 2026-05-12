@@ -18,18 +18,18 @@ export default defineNuxtConfig({
     plugins: [
         tailwindcss(),
     ],
-    server: {
-      proxy: {
-        '/api': {
-          target: 'http://82.202.139.222:8080',
-          changeOrigin: true,
-          secure: false,
-        },
-        '/photo': {
-          target: 'http://82.202.139.222:8080',
-          changeOrigin: true,
-          secure: false,
-        }
+  },
+  nitro: {
+    devProxy: {
+      '/api': {
+        target: 'http://82.202.139.222:8080/api',
+        changeOrigin: true,
+        prependPath: true,
+      },
+      '/photo': {
+        target: 'http://82.202.139.222:8080/api',
+        changeOrigin: true,
+        prependPath: true,
       }
     }
   },
@@ -56,9 +56,9 @@ export default defineNuxtConfig({
     componentDir: '@/components/ui'
   },
   runtimeConfig: {
-    //на этот уровень класть те, что доступны только на сервере
+    apiBase: 'http://82.202.139.222:8080/api', // SSR идёт напрямую
     public: {
-      apiBase: ''
+      apiBase: '' // клиент использует devProxy
     }
   }
 })

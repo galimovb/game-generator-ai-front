@@ -16,7 +16,7 @@ export interface TicketMessage {
   text: string | null;
   photos: string[] | null;
   messageType: string;
-  owner: User;
+  author: User;
   createdAt: string;
   updatedAt: string | null;
 }

@@ -7,11 +7,12 @@ import {
   ChevronsUpDown,
   LogOut,
   UserPen,
+  ShieldCheck
 } from "lucide-vue-next";
 
 const profileStore = useProfileStore();
 const { logout } = profileStore;
-const { profile, avatarUrl } = storeToRefs(profileStore);
+const { profile, isAdminOrSupport } = storeToRefs(profileStore);
 const firstGroup = [
   {
     title: "Главная",
@@ -110,6 +111,14 @@ const secondGroup = [
       <SidebarGroup class="mt-auto">
         <SidebarGroupContent>
           <SidebarMenu>
+            <SidebarMenuItem v-if="isAdminOrSupport">
+              <SidebarMenuButton as-child>
+                <NuxtLink to="/admin" active-class="bg-sidebar-accent">
+                  <ShieldCheck :size="18" />
+                  <span>Админ панель</span>
+                </NuxtLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             <AppSettings />
             <SidebarMenuItem v-for="item in secondGroup" :key="item.title">
               <SidebarMenuButton as-child>

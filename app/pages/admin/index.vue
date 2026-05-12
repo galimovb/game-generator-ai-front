@@ -42,7 +42,7 @@ const cards = computed(() =>
 </script>
 
 <template>
-  <div class="py-8 px-6 max-w-5xl mx-auto">
+  <div class="py-8 px-6 max-w-7xl mx-auto">
     <div class="mb-8">
       <h1 class="text-2xl font-bold">Дашборд</h1>
       <p class="text-muted-foreground text-sm mt-1">Обзор обращений пользователей</p>
@@ -52,7 +52,7 @@ const cards = computed(() =>
       <NuxtLink v-for="card in cards" :key="card.title" :to="card.href">
         <Card class="hover:shadow-md transition-shadow cursor-pointer h-full">
           <CardContent class="p-5">
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center justify-between gap-3 mb-3">
               <span class="text-sm text-muted-foreground">{{ card.title }}</span>
               <component :is="card.icon" :size="18" :class="card.color" />
             </div>
@@ -62,15 +62,6 @@ const cards = computed(() =>
             <p v-else class="text-3xl font-bold">{{ card.value }}</p>
           </CardContent>
         </Card>
-      </NuxtLink>
-    </div>
-
-    <div class="mt-8 flex items-center gap-3">
-      <NuxtLink to="/admin/tickets">
-        <Button class="gap-2">
-          <Headset :size="16" />
-          Перейти к тикетам
-        </Button>
       </NuxtLink>
     </div>
   </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Send, ArrowLeft, Loader2, Paperclip, X, UserCheck, ChevronDown } from "lucide-vue-next";
+import { Send, ArrowLeft, Loader2, Paperclip, X, UserCheck, ChevronDown, MessageSquare, CheckCircle2 } from "lucide-vue-next";
 
 definePageMeta({
   layout: "admin",
@@ -19,7 +19,7 @@ const selectedTicketId = computed(() => {
   return id ? parseInt(id as string) : null;
 });
 
-const statusFilter = ref("all");
+const statusFilter = ref(route.query.status?.toString() || "all");
 const page = ref(1);
 const limit = 20;
 const searchQuery = ref("");
@@ -32,7 +32,6 @@ const priorityConfig = ticketPriorityConfig;
 const {
   data: tickets,
   pending: ticketsPending,
-  refresh: refreshTickets,
 } = await useAsyncData(
   "admin-tickets",
   async () => {
@@ -324,40 +323,6 @@ const invalidateMessagesCache = () => {
   if (cache) cache.loaded = false;
 };
 
-// ==================== SYSTEM MESSAGES ====================
-
-const systemMessageLabels: Record<string, string> = {
-  open: "Открыт",
-  in_progress: "В работе",
-  waiting_for_user: "Ожидает ответа",
-  resolved: "Решён",
-  closed: "Закрыт",
-  low: "Низкий",
-  medium: "Средний",
-  high: "Высокий",
-  urgent: "Срочный",
-};
-
-const parseSystemMessage = (text: string): string => {
-  try {
-    const payload = JSON.parse(text);
-    switch (payload.event) {
-      case "assigned":
-        return `Тикет взят в работу`;
-      case "status_changed":
-        return `Статус изменён: ${systemMessageLabels[payload.from] ?? payload.from} → ${systemMessageLabels[payload.to] ?? payload.to}`;
-      case "priority_changed":
-        return `Приоритет изменён: ${systemMessageLabels[payload.from] ?? payload.from} → ${systemMessageLabels[payload.to] ?? payload.to}`;
-      case "closed":
-        return `Тикет закрыт`;
-      default:
-        return text;
-    }
-  } catch {
-    return text;
-  }
-};
-
 // ==================== NAVIGATION ====================
 
 const goToTicket = (id: number) => {
@@ -378,7 +343,7 @@ const onPageChange = (newPage: number) => {
 };
 
 const isMyMessage = (message: TicketMessage): boolean =>
-  message.owner?.id === profileStore.profile?.id;
+  message.author?.id === profileStore.profile?.id;
 
 const isAlreadyAssigned = computed(() =>
   selectedTicket.value?.assignedTo?.id === profileStore.profile?.id,
@@ -510,12 +475,16 @@ const isAlreadyAssigned = computed(() =>
               </Button>
               <div>
                 <p class="font-semibold text-sm">{{ selectedTicket.subject }}</p>
-                <p class="text-xs text-muted-foreground">
-                  Автор: {{ getUserFullName(selectedTicket.author) || selectedTicket.author?.email }}
-                  <span v-if="selectedTicket.assignedTo" class="ml-2">
-                    · Назначен: {{ getUserFullName(selectedTicket.assignedTo) || selectedTicket.assignedTo?.email }}
-                  </span>
-                </p>
+                <div class="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div class="flex items-center gap-1">
+                    <span>Автор:</span>
+                    <User :user="selectedTicket.author" :size="6" />
+                  </div>
+                  <div v-if="selectedTicket.assignedTo" class="flex items-center gap-1">
+                    <span>Назначен:</span>
+                    <User :user="selectedTicket.assignedTo" :size="6" />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -558,7 +527,7 @@ const isAlreadyAssigned = computed(() =>
                   <DropdownMenuItem
                     v-for="(cfg, key) in statusConfig"
                     :key="key"
-                    :disabled="key === selectedTicket.status || key === 'closed'"
+                    :disabled="key === selectedTicket.status || key === 'closed' || key === 'in_progress'"
                     class="text-xs gap-2"
                     @click="changeStatus(key)"
                   >
@@ -649,8 +618,7 @@ const isAlreadyAssigned = computed(() =>
                   class="flex justify-center"
                 >
                   <span class="text-xs text-muted-foreground bg-muted px-3 py-1 rounded-full">
-                    {{ parseSystemMessage(message.text ?? "") }}
-                    · {{ formatDate(message.createdAt) }}
+                    {{ message.text }} - {{ formatDate(message.createdAt) }}
                   </span>
                 </div>
 
@@ -662,7 +630,7 @@ const isAlreadyAssigned = computed(() =>
                 >
                   <User
                     v-if="!isMyMessage(message)"
-                    :user="message.owner"
+                    :user="message.author"
                     :size="8"
                     :show-name="false"
                     name-position="right"
@@ -680,7 +648,7 @@ const isAlreadyAssigned = computed(() =>
                   >
                     <div class="flex items-center justify-between gap-3 mb-1">
                       <span class="text-xs font-medium opacity-80">
-                        {{ getUserFullName(message.owner) || message.owner?.email }}
+                        {{ getUserFullName(message.author) || message.author?.email }}
                         <span
                           v-if="message.messageType === 'support' && !isMyMessage(message)"
                           class="ml-1 text-blue-500"
@@ -706,7 +674,7 @@ const isAlreadyAssigned = computed(() =>
                   </div>
                   <User
                     v-if="isMyMessage(message)"
-                    :user="message.owner"
+                    :user="message.author"
                     :size="8"
                     :show-name="false"
                     name-position="left"

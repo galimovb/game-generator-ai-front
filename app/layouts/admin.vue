@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Gamepad2, TicketCheck, LogOut } from "lucide-vue-next";
+import { Gamepad2, TicketCheck, LogOut, ExternalLink } from "lucide-vue-next";
 
 const profileStore = useProfileStore();
 const route = useRoute();
@@ -33,8 +33,12 @@ const navLinks = [
           </nav>
         </div>
 
-        <div class="flex items-center gap-3">
-          <span class="text-sm text-muted-foreground">{{ profileStore.fullName }}</span>
+        <div class="flex items-center gap-4">
+          <NuxtLink to="/" class="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors" title="Открыть пользовательский интерфейс">
+            <ExternalLink :size="14" />
+            <span>Сайт</span>
+          </NuxtLink>
+          <User :user="profileStore.profile"/>
           <Button variant="ghost" size="icon" @click="profileStore.logout" title="Выйти">
             <LogOut :size="16" />
           </Button>
@@ -42,7 +46,7 @@ const navLinks = [
       </div>
     </header>
 
-    <main class="flex-1 flex flex-col overflow-hidden">
+    <main class="flex-1 flex flex-col">
       <slot />
     </main>
   </div>

@@ -1,6 +1,5 @@
-export const getPhotoUrl = (path: string): string => {
+export const getPhotoUrl = (path?: string): string => {
   if (!path) return "";
-  const config = useRuntimeConfig();
   return `/photo${path}`;
 };
 

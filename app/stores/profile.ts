@@ -17,6 +17,13 @@ export const useProfileStore = defineStore("profile", () => {
     return getUserFullName(profile.value);
   });
 
+  const isAdminOrSupport = computed(() => {
+    if (!profile.value?.roles) return false;
+    return profile.value.roles.some(
+        (role) => role === "ROLE_ADMIN" || role === "ROLE_SUPPORT"
+    );
+  });
+
   async function fetchProfile() {
     loading.value = true;
     error.value = null;
@@ -26,6 +33,7 @@ export const useProfileStore = defineStore("profile", () => {
       profile.value = response.result;
     } catch (err: any) {
       error.value = err.data?.message || "Ошибка загрузки профиля";
+      console.error("Ошибка загрузки профиля", err.data)
     } finally {
       loading.value = false;
     }
@@ -98,5 +106,6 @@ export const useProfileStore = defineStore("profile", () => {
     updateProfile,
     uploadAvatar,
     logout,
+    isAdminOrSupport
   };
 });

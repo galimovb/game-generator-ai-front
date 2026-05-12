@@ -333,7 +333,7 @@ const onPageChange = (newPage: number) => {
 };
 
 const isMyMessage = (message: TicketMessage): boolean => {
-  return message.owner.id === profileStore.profile?.id;
+  return message.author?.id === profileStore.profile?.id;
 };
 </script>
 
@@ -349,9 +349,7 @@ const isMyMessage = (message: TicketMessage): boolean => {
           <SelectContent>
             <SelectItem value="all">Все диалоги</SelectItem>
             <SelectItem value="open">Открытые</SelectItem>
-            <SelectItem value="in_progress">В работе</SelectItem>
             <SelectItem value="waiting_for_user">Ожидают ответа</SelectItem>
-            <SelectItem value="closed">Закрытые</SelectItem>
           </SelectContent>
         </Select>
         <CreateTicketDialog @success="refreshTickets" />
@@ -551,61 +549,78 @@ const isMyMessage = (message: TicketMessage): boolean => {
             </div>
 
             <div v-else class="space-y-2">
-              <div
+              <template
                 v-for="message in currentMessagesCache?.items"
                 :key="message.id"
-                class="flex gap-2"
-                :class="isMyMessage(message) ? 'justify-end' : 'justify-start'"
               >
-                <User
-                  v-if="!isMyMessage(message)"
-                  :user="message.owner"
-                  :size="8"
-                  :show-name="false"
-                  name-position="right"
-                  class="self-end"
-                />
+                <!-- System message -->
                 <div
-                  class="max-w-[70%] rounded-lg p-3"
-                  :class="
-                    isMyMessage(message)
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-background'
-                  "
+                  v-if="message.messageType === 'system'"
+                  class="flex justify-center"
                 >
-                  <div class="flex items-center justify-between gap-3 mb-1">
-                    <span class="text-xs font-medium">
-                      {{ getUserFullName(message.owner) }}
-                    </span>
-                    <span class="text-xs opacity-70">
-                      {{ formatDate(message.createdAt) }}
-                    </span>
-                  </div>
-                  <p class="text-sm whitespace-pre-wrap break-words">
-                    {{ message.text }}
-                  </p>
-                  <div
-                    v-if="message.photos?.length"
-                    class="mt-2 grid grid-cols-2 gap-2"
-                  >
-                    <img
-                      v-for="(photo, idx) in message.photos"
-                      :key="idx"
-                      :src="getPhotoUrl(photo)"
-                      alt="Photo"
-                      class="rounded-md max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
-                    />
+                  <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs">
+                    <span>{{ message.text }}</span>
+                    <span class="opacity-60">·</span>
+                    <span class="opacity-60">{{ formatDate(message.createdAt) }}</span>
                   </div>
                 </div>
-                <User
-                  v-if="isMyMessage(message)"
-                  :user="message.owner"
-                  :size="8"
-                  :show-name="false"
-                  name-position="left"
-                  class="self-end"
-                />
-              </div>
+
+                <!-- User message -->
+                <div
+                  v-else
+                  class="flex gap-2"
+                  :class="isMyMessage(message) ? 'justify-end' : 'justify-start'"
+                >
+                  <User
+                    v-if="!isMyMessage(message)"
+                    :user="message.author"
+                    :size="8"
+                    :show-name="false"
+                    name-position="right"
+                    class="self-end"
+                  />
+                  <div
+                    class="max-w-[70%] rounded-lg p-3"
+                    :class="
+                      isMyMessage(message)
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-background'
+                    "
+                  >
+                    <div class="flex items-center justify-between gap-3 mb-1">
+                      <span class="text-xs font-medium">
+                        {{ getUserFullName(message.author) }}
+                      </span>
+                      <span class="text-xs opacity-70">
+                        {{ formatDate(message.createdAt) }}
+                      </span>
+                    </div>
+                    <p class="text-sm whitespace-pre-wrap break-words">
+                      {{ message.text }}
+                    </p>
+                    <div
+                      v-if="message.photos?.length"
+                      class="mt-2 grid grid-cols-2 gap-2"
+                    >
+                      <img
+                        v-for="(photo, idx) in message.photos"
+                        :key="idx"
+                        :src="getPhotoUrl(photo)"
+                        alt="Photo"
+                        class="rounded-md max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
+                      />
+                    </div>
+                  </div>
+                  <User
+                    v-if="isMyMessage(message)"
+                    :user="message.author"
+                    :size="8"
+                    :show-name="false"
+                    name-position="left"
+                    class="self-end"
+                  />
+                </div>
+              </template>
 
               <div
                 v-if="
