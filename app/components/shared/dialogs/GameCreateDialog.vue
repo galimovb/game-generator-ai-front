@@ -200,7 +200,7 @@ const onClose = () => {
         </DialogDescription>
       </DialogHeader>
 
-      <form @submit.prevent="onSubmit" class="space-y-4 py-4">
+      <form class="space-y-4 py-4" @submit.prevent="onSubmit">
         <!-- Фото -->
         <div class="flex justify-center mb-4">
           <div class="flex flex-wrap gap-2 justify-center max-w-md">
@@ -213,10 +213,10 @@ const onClose = () => {
                 :src="preview"
                 class="w-full h-full object-cover"
                 alt="Preview"
-              />
+              >
               <button
-                @click="removePhoto(index)"
                 class="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 w-5 h-5 flex items-center justify-center text-xs hover:opacity-80"
+                @click="removePhoto(index)"
               >
                 <X :size="10" />
               </button>
@@ -233,7 +233,7 @@ const onClose = () => {
                 accept="image/*"
                 class="hidden"
                 @change="handlePhotoSelect"
-              />
+              >
             </label>
           </div>
         </div>
@@ -415,8 +415,8 @@ const onClose = () => {
             >
               <span>{{ item }}</span>
               <button
-                @click="removeRequisite(index)"
                 class="text-muted-foreground hover:text-foreground ml-1"
+                @click="removeRequisite(index)"
               >
                 <X :size="12" />
               </button>

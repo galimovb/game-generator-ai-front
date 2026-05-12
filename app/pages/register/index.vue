@@ -98,7 +98,7 @@ const onSubmit = handleSubmit(async (formValues) => {
       </CardHeader>
 
       <CardContent>
-        <form @submit.prevent="onSubmit" class="space-y-4">
+        <form class="space-y-4" @submit.prevent="onSubmit">
           <FormField v-slot="{ componentField }" name="email">
             <FormItem>
               <FormLabel>Email</FormLabel>

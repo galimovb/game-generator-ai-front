@@ -72,7 +72,7 @@ const handleCommentDeleted = (gameId: number) => {
                   :src="getPhotoUrl(photo)"
                   class="w-full h-48 object-cover rounded-lg border"
                   :alt="`Game photo ${idx + 1}`"
-                />
+                >
               </div>
             </CarouselItem>
           </CarouselContent>

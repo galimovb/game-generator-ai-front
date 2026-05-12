@@ -39,7 +39,7 @@ const navLinks = [
             <span>Сайт</span>
           </NuxtLink>
           <User :user="profileStore.profile"/>
-          <Button variant="ghost" size="icon" @click="profileStore.logout" title="Выйти">
+          <Button variant="ghost" size="icon" title="Выйти" @click="profileStore.logout">
             <LogOut :size="16" />
           </Button>
         </div>

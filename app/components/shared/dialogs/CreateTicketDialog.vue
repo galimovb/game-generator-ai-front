@@ -84,7 +84,7 @@ const onSubmit = handleSubmit(async (formValues) => {
           </DialogDescription>
         </DialogHeader>
 
-        <form @submit.prevent="onSubmit" class="space-y-4 py-4">
+        <form class="space-y-4 py-4" @submit.prevent="onSubmit">
           <FormField v-slot="{ componentField }" name="subject">
             <FormItem>
               <FormLabel>Тема обращения</FormLabel>
@@ -128,8 +128,8 @@ const onSubmit = handleSubmit(async (formValues) => {
             <Button
               type="button"
               variant="outline"
-              @click="open = false"
               :disabled="loading"
+              @click="open = false"
             >
               Отмена
             </Button>

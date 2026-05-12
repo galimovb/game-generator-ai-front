@@ -183,7 +183,7 @@ watch(
           <p class="text-sm text-muted-foreground">Нет комментариев</p>
         </div>
 
-        <div v-else v-for="comment in state.comments" :key="comment.id">
+        <div v-for="comment in state.comments" v-else :key="comment.id">
           <div :class="['flex', isMyComment(comment) ? 'justify-end' : '']">
             <div class="flex gap-2 max-w-[85%] items-end">
               <User
@@ -207,8 +207,8 @@ watch(
                         Ответить
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        @click="deleteComment(comment.id)"
                         class="text-destructive"
+                        @click="deleteComment(comment.id)"
                       >
                         <Trash2 class="w-4 h-4 mr-2" />
                         Удалить
@@ -245,7 +245,7 @@ watch(
                     <div
                       class="flex items-center text-sm text-muted-foreground bg-muted/30 rounded-lg border border-muted-foreground/20 overflow-hidden"
                     >
-                      <div class="w-[4px] bg-primary self-stretch"></div>
+                      <div class="w-[4px] bg-primary self-stretch"/>
                       <div class="grid flex-1 py-1 px-2">
                         <span class="font-medium">{{
                           getUserFullName(
@@ -329,8 +329,8 @@ watch(
           />
           <Button
             size="sm"
-            @click="submitComment"
             :disabled="!state.form.text.trim() || state.form.submitting"
+            @click="submitComment"
           >
             <Send v-if="!state.form.submitting" class="w-4 h-4" />
             <Loader v-else class="w-4 h-4 animate-spin" />

@@ -344,7 +344,7 @@ onMounted(async () => {
           </CardTitle>
 
           <div v-if="!loading && isAuthor && !isEditing" class="flex gap-2">
-            <Button @click="startEditing" variant="link" size="sm"
+            <Button variant="link" size="sm" @click="startEditing"
               >Изменить</Button
             >
             <AlertDialog>
@@ -396,7 +396,7 @@ onMounted(async () => {
                     <img
                       :src="getPhotoUrl(photo)"
                       class="w-full h-64 object-cover rounded-lg"
-                    />
+                    >
                   </CarouselItem>
                 </CarouselContent>
                 <CarouselPrevious
@@ -652,8 +652,8 @@ onMounted(async () => {
                 variant="outline"
                 size="icon"
                 class="h-7 w-7"
-                @click="isAddingRequisit = !isAddingRequisit"
                 :disabled="saving"
+                @click="isAddingRequisit = !isAddingRequisit"
               >
                 <Plus :size="14" />
               </Button>
@@ -771,8 +771,8 @@ onMounted(async () => {
                         variant="ghost"
                         size="icon"
                         class="h-7 w-7 text-primary"
-                        @click="saveStageChanges(stage.id)"
                         :disabled="savingStageId === stage.id"
+                        @click="saveStageChanges(stage.id)"
                       >
                         <Loader
                           v-if="savingStageId === stage.id"
@@ -784,8 +784,8 @@ onMounted(async () => {
                         variant="ghost"
                         size="icon"
                         class="h-7 w-7"
-                        @click="cancelEditingStage"
                         :disabled="savingStageId === stage.id"
+                        @click="cancelEditingStage"
                       >
                         <X :size="14" />
                       </Button>
@@ -834,8 +834,8 @@ onMounted(async () => {
                       variant="outline"
                       size="icon"
                       class="h-6 w-6"
-                      @click="addingTaskForStage = stage.id"
                       :disabled="savingStageId === stage.id"
+                      @click="addingTaskForStage = stage.id"
                     >
                       <Plus :size="12" />
                     </Button>
@@ -867,8 +867,8 @@ onMounted(async () => {
                         variant="ghost"
                         size="icon"
                         class="h-5 w-5"
-                        @click="removeStageTask(idx)"
                         :disabled="savingStageId === stage.id"
+                        @click="removeStageTask(idx)"
                       >
                         <X :size="12" />
                       </Button>
@@ -881,14 +881,14 @@ onMounted(async () => {
                         v-model="newStageTask"
                         placeholder="Новое задание"
                         class="flex-1"
-                        @keyup.enter="addStageTask"
                         :disabled="savingStageId === stage.id"
+                        @keyup.enter="addStageTask"
                       />
                       <Button
                         size="icon"
                         class="h-7 w-7"
-                        @click="addStageTask"
                         :disabled="savingStageId === stage.id"
+                        @click="addStageTask"
                       >
                         <Check :size="14" />
                       </Button>
@@ -906,8 +906,8 @@ onMounted(async () => {
                       variant="outline"
                       size="icon"
                       class="h-6 w-6"
-                      @click="addingPropForStage = stage.id"
                       :disabled="savingStageId === stage.id"
+                      @click="addingPropForStage = stage.id"
                     >
                       <Plus :size="12" />
                     </Button>
@@ -937,8 +937,8 @@ onMounted(async () => {
                         <Button
                           variant="ghost"
                           class="p-0.5 h-5 w-5 hover:text-destructive"
-                          @click="removeStageProp(idx)"
                           :disabled="savingStageId === stage.id"
+                          @click="removeStageProp(idx)"
                         >
                           <X :size="12" />
                         </Button>
@@ -951,14 +951,14 @@ onMounted(async () => {
                           v-model="newStageProp"
                           placeholder="Новый реквизит"
                           class="w-40"
-                          @keyup.enter="addStageProp"
                           :disabled="savingStageId === stage.id"
+                          @keyup.enter="addStageProp"
                         />
                         <Button
                           size="icon"
                           class="h-7 w-7"
-                          @click="addStageProp"
                           :disabled="savingStageId === stage.id"
+                          @click="addStageProp"
                         >
                           <Check :size="14" />
                         </Button>
@@ -973,7 +973,7 @@ onMounted(async () => {
 
         <div v-if="isEditing" class="flex justify-end gap-2 pt-4">
           <Button variant="outline" @click="cancelEdit">Отмена</Button>
-          <Button @click="onSubmit" :disabled="saving">
+          <Button :disabled="saving" @click="onSubmit">
             <Loader v-if="saving" class="w-4 h-4 mr-2 animate-spin" />
             Сохранить
           </Button>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Settings, Moon, Sun } from "lucide-vue-next";
 import { watchDebounced } from "@vueuse/core";
-import { modelTypes } from "~/lib/constants";
 
 const appData = useAppData();
 const { states, updateSettings } = useSettingsStore();
@@ -149,13 +148,13 @@ watchDebounced(
               <h5 class="text-sm font-medium leading-none">Радиус</h5>
               <div class="grid grid-cols-5 gap-2">
                 <Button
-                  variant="outline"
-                  size="sm"
                   v-for="value in availableRadius"
                   :key="value"
+                  variant="outline"
+                  size="sm"
                   class="aria-checked:ring-2 aria-checked:ring-foreground"
-                  @click="setRadius(value)"
                   :aria-checked="radius === value"
+                  @click="setRadius(value)"
                 >
                   <span class="text-sm text-muted-foreground">{{ value }}</span>
                 </Button>
@@ -167,13 +166,13 @@ watchDebounced(
               <h5 class="text-sm font-medium leading-none">Размер шрифта</h5>
               <div class="grid grid-cols-4 gap-2">
                 <Button
-                  variant="outline"
-                  size="sm"
                   v-for="value in availableFontSize"
                   :key="value"
+                  variant="outline"
+                  size="sm"
                   class="aria-checked:ring-2 aria-checked:ring-foreground"
-                  @click="setFont(value)"
                   :aria-checked="fontSize === value"
+                  @click="setFont(value)"
                 >
                   <span class="text-sm text-muted-foreground"
                     >{{ value }}px</span
@@ -190,8 +189,8 @@ watchDebounced(
                   variant="outline"
                   size="sm"
                   class="aria-checked:ring-2 aria-checked:ring-foreground px-1 justify-start"
-                  @click="setTheme('light')"
                   :aria-checked="!isDarkTheme"
+                  @click="setTheme('light')"
                 >
                   <Sun class="w-5 h-5 fill-yellow-600 stroke-yellow-600 mr-1" />
                   <span class="text-sm text-muted-foreground">Светлая</span>
@@ -200,8 +199,8 @@ watchDebounced(
                   variant="outline"
                   size="sm"
                   class="aria-checked:ring-2 aria-checked:ring-foreground px-1 justify-start"
-                  @click="setTheme('dark')"
                   :aria-checked="isDarkTheme"
+                  @click="setTheme('dark')"
                 >
                   <Moon class="w-5 h-5 stroke-current mr-1" />
                   <span class="text-sm text-muted-foreground">Тёмная</span>

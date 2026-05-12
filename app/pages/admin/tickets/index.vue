@@ -669,7 +669,7 @@ const isAlreadyAssigned = computed(() =>
                         :src="getPhotoUrl(photo)"
                         alt="Photo"
                         class="rounded-md max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
-                      />
+                      >
                     </div>
                   </div>
                   <User
@@ -700,7 +700,7 @@ const isAlreadyAssigned = computed(() =>
           >
             <div v-if="photoPreviews.length" class="flex gap-2 mb-2 flex-wrap">
               <div v-for="(preview, index) in photoPreviews" :key="index" class="relative group">
-                <img :src="preview" alt="Preview" class="w-12 h-12 object-cover rounded-md" />
+                <img :src="preview" alt="Preview" class="w-12 h-12 object-cover rounded-md" >
                 <Button
                   variant="destructive"
                   size="icon"
@@ -720,7 +720,7 @@ const isAlreadyAssigned = computed(() =>
                 accept="image/*"
                 class="hidden"
                 @change="handleFileSelect"
-              />
+              >
               <Button
                 variant="secondary"
                 size="icon"

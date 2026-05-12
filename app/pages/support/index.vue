@@ -608,7 +608,7 @@ const isMyMessage = (message: TicketMessage): boolean => {
                         :src="getPhotoUrl(photo)"
                         alt="Photo"
                         class="rounded-md max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
-                      />
+                      >
                     </div>
                   </div>
                   <User
@@ -651,7 +651,7 @@ const isMyMessage = (message: TicketMessage): boolean => {
                   :src="preview"
                   alt="Preview"
                   class="w-12 h-12 object-cover rounded-md"
-                />
+                >
                 <Button
                   variant="destructive"
                   size="icon"
@@ -671,7 +671,7 @@ const isMyMessage = (message: TicketMessage): boolean => {
                 accept="image/*"
                 class="hidden"
                 @change="handleFileSelect"
-              />
+              >
               <Button
                 variant="secondary"
                 size="icon"
@@ -687,11 +687,11 @@ const isMyMessage = (message: TicketMessage): boolean => {
                 @keydown.ctrl.enter="sendMessage"
               />
               <Button
-                @click="sendMessage"
                 :disabled="
                   sending || (!newMessage.trim() && !selectedPhotos.length)
                 "
                 size="icon"
+                @click="sendMessage"
               >
                 <Send v-if="!sending" :size="16" />
                 <Loader2 v-else :size="16" class="animate-spin" />

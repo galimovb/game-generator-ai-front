@@ -97,7 +97,7 @@ const cancelEdit = () => {
 
     <div v-else-if="error" class="text-center py-12">
       <p>{{ error }}</p>
-      <Button @click="profileStore.fetchProfile" class="mt-4">Повторить</Button>
+      <Button class="mt-4" @click="profileStore.fetchProfile">Повторить</Button>
     </div>
 
     <div v-else class="border rounded-lg p-6">
@@ -124,10 +124,10 @@ const cancelEdit = () => {
         <div class="flex-1">
           <div class="flex justify-between items-center mb-6">
             <h1 class="text-xl font-semibold">Профиль</h1>
-            <Button v-if="!isEditing" @click="startEdit" variant="link">Изменить</Button>
+            <Button v-if="!isEditing" variant="link" @click="startEdit">Изменить</Button>
           </div>
 
-          <form v-if="isEditing" @submit.prevent="onSubmit" class="space-y-4">
+          <form v-if="isEditing" class="space-y-4" @submit.prevent="onSubmit">
             <FormField v-slot="{ componentField }" name="name">
               <FormItem>
                 <FormLabel>Имя</FormLabel>

@@ -172,7 +172,7 @@ onMounted(() => {
                 <img
                   :src="getPhotoUrl(game.photos[0])"
                   class="w-full h-48 object-cover rounded-lg border"
-                />
+                >
               </div>
               <div
                 v-else

@@ -34,7 +34,7 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ['shadcn-nuxt', '@pinia/nuxt', 'vue-sonner/nuxt'],
+  modules: ['shadcn-nuxt', '@pinia/nuxt', 'vue-sonner/nuxt', '@nuxt/eslint'],
   pinia: {
     storesDirs: ['./stores/**'],
   },
