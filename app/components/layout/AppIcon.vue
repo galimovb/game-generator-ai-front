@@ -4,9 +4,9 @@ import { Gamepad2 } from "lucide-vue-next";
 
 <template>
   <NuxtLink to="/">
-    <div class="flex items-center gap-1">
-      <Gamepad2 :size="26" />
-      <span>Игротека AI</span>
+    <div class="flex items-center gap-2">
+      <Gamepad2 :size="30" class="text-primary" />
+      <span class="font-bold">Игротека AI</span>
     </div>
   </NuxtLink>
 </template>

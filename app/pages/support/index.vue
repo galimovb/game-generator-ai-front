@@ -558,10 +558,14 @@ const isMyMessage = (message: TicketMessage): boolean => {
                   v-if="message.messageType === 'system'"
                   class="flex justify-center"
                 >
-                  <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs">
+                  <div
+                    class="flex items-center gap-2 px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs"
+                  >
                     <span>{{ message.text }}</span>
                     <span class="opacity-60">·</span>
-                    <span class="opacity-60">{{ formatDate(message.createdAt) }}</span>
+                    <span class="opacity-60">{{
+                      formatDate(message.createdAt)
+                    }}</span>
                   </div>
                 </div>
 
@@ -569,7 +573,9 @@ const isMyMessage = (message: TicketMessage): boolean => {
                 <div
                   v-else
                   class="flex gap-2"
-                  :class="isMyMessage(message) ? 'justify-end' : 'justify-start'"
+                  :class="
+                    isMyMessage(message) ? 'justify-end' : 'justify-start'
+                  "
                 >
                   <User
                     v-if="!isMyMessage(message)"
@@ -608,7 +614,7 @@ const isMyMessage = (message: TicketMessage): boolean => {
                         :src="getPhotoUrl(photo)"
                         alt="Photo"
                         class="rounded-md max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
-                      >
+                      />
                     </div>
                   </div>
                   <User
@@ -651,7 +657,7 @@ const isMyMessage = (message: TicketMessage): boolean => {
                   :src="preview"
                   alt="Preview"
                   class="w-12 h-12 object-cover rounded-md"
-                >
+                />
                 <Button
                   variant="destructive"
                   size="icon"
@@ -671,7 +677,7 @@ const isMyMessage = (message: TicketMessage): boolean => {
                 accept="image/*"
                 class="hidden"
                 @change="handleFileSelect"
-              >
+              />
               <Button
                 variant="secondary"
                 size="icon"

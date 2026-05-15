@@ -5,14 +5,19 @@ export const useApi = () => {
   let isRefreshing = false;
   let refreshPromise: Promise<any> | null = null;
 
-  const fetchWithAuth = async (
-    url: string,
-    options: any = {},
-    currentUrl?: string,
-  ) => {
+  const getCurrentUrl = () =>
+      import.meta.server
+          ? useRequestURL().pathname + useRequestURL().search
+          : window.location.pathname + window.location.search;
+
+  const fetchWithAuth = async <T = any>(
+      url: string,
+      options: any = {},
+      currentUrl?: string,
+  ): Promise<T> => {
     const event = import.meta.server ? useRequestEvent() : null;
 
-    const makeRequest = () => $api(url, options);
+    const makeRequest = () => $api<T>(url, options);
 
     try {
       return await makeRequest();
@@ -23,18 +28,17 @@ export const useApi = () => {
       if (!isRefreshing) {
         isRefreshing = true;
         refreshPromise = $api("/auth/refresh", { method: "POST" })
-          .catch((e) => {
-            if (import.meta.server && event) {
-              return sendRedirect(event, "/login", 302);
-            } else {
-              return navigateTo("/login");
-            }
-            throw e;
-          })
-          .finally(() => {
-            isRefreshing = false;
-            refreshPromise = null;
-          });
+            .catch(() => {
+              if (import.meta.server && event) {
+                return sendRedirect(event, "/login", 302);
+              } else {
+                return navigateTo("/login");
+              }
+            })
+            .finally(() => {
+              isRefreshing = false;
+              refreshPromise = null;
+            });
       }
 
       await refreshPromise;
@@ -42,63 +46,26 @@ export const useApi = () => {
       if (import.meta.client) {
         return await makeRequest();
       } else {
-        await sendRedirect(event, currentUrl, 302);
-        return;
+        await sendRedirect(event!, currentUrl!, 302);
+        return undefined as T;
       }
     }
   };
 
   return {
-    get: (url: string, options?: any) => {
-      const currentUrl = import.meta.server
-        ? useRequestURL().pathname + useRequestURL().search
-        : window.location.pathname + window.location.search;
+    get: <T = any>(url: string, options?: any) =>
+        fetchWithAuth<T>(url, { method: "GET", ...options }, getCurrentUrl()),
 
-      return fetchWithAuth(url, { method: "GET", ...options }, currentUrl);
-    },
+    post: <T = any>(url: string, body?: any, options?: any) =>
+        fetchWithAuth<T>(url, { method: "POST", body, ...options }, getCurrentUrl()),
 
-    post: (url: string, body?: any, options?: any) => {
-      const currentUrl = import.meta.server
-        ? useRequestURL().pathname + useRequestURL().search
-        : window.location.pathname + window.location.search;
+    put: <T = any>(url: string, body?: any, options?: any) =>
+        fetchWithAuth<T>(url, { method: "PUT", body, ...options }, getCurrentUrl()),
 
-      return fetchWithAuth(
-        url,
-        { method: "POST", body, ...options },
-        currentUrl,
-      );
-    },
+    patch: <T = any>(url: string, body?: any, options?: any) =>
+        fetchWithAuth<T>(url, { method: "PATCH", body, ...options }, getCurrentUrl()),
 
-    put: (url: string, body?: any, options?: any) => {
-      const currentUrl = import.meta.server
-        ? useRequestURL().pathname + useRequestURL().search
-        : window.location.pathname + window.location.search;
-
-      return fetchWithAuth(
-        url,
-        { method: "PUT", body, ...options },
-        currentUrl,
-      );
-    },
-
-    patch: (url: string, body?: any, options?: any) => {
-      const currentUrl = import.meta.server
-        ? useRequestURL().pathname + useRequestURL().search
-        : window.location.pathname + window.location.search;
-
-      return fetchWithAuth(
-        url,
-        { method: "PATCH", body, ...options },
-        currentUrl,
-      );
-    },
-
-    del: (url: string, options?: any) => {
-      const currentUrl = import.meta.server
-        ? useRequestURL().pathname + useRequestURL().search
-        : window.location.pathname + window.location.search;
-
-      return fetchWithAuth(url, { method: "DELETE", ...options }, currentUrl);
-    },
+    del: <T = any>(url: string, options?: any) =>
+        fetchWithAuth<T>(url, { method: "DELETE", ...options }, getCurrentUrl()),
   };
 };

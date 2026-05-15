@@ -117,7 +117,7 @@ const loadData = async () => {
 
   try {
     const gameId = route.params.id;
-    const gameResponse = await get(`/games/${gameId}`);
+    const gameResponse = await get<SingleResponse<Game>>(`/games/${gameId}`);
     game.value = gameResponse.result;
 
     isAuthor.value = profile.value?.id === game.value?.author.id;
@@ -396,7 +396,7 @@ onMounted(async () => {
                     <img
                       :src="getPhotoUrl(photo)"
                       class="w-full h-64 object-cover rounded-lg"
-                    >
+                    />
                   </CarouselItem>
                 </CarouselContent>
                 <CarouselPrevious

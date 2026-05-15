@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    namePosition: "left" | "right";
+    namePosition?: "left" | "right";
     showName?: boolean;
     user: UserProfile;
     size?: number;

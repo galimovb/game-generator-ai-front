@@ -20,7 +20,7 @@ export const useProfileStore = defineStore("profile", () => {
   const isAdminOrSupport = computed(() => {
     if (!profile.value?.roles) return false;
     return profile.value.roles.some(
-        (role) => role === "ROLE_ADMIN" || role === "ROLE_SUPPORT"
+      (role) => role === "ROLE_ADMIN" || role === "ROLE_SUPPORT",
     );
   });
 
@@ -29,9 +29,9 @@ export const useProfileStore = defineStore("profile", () => {
     error.value = null;
 
     try {
-      const response = await get("/users/profile");
+      const response = await get<SingleResponse<UserProfile>>("/users/profile");
       profile.value = response.result;
-    } catch (err: any) {
+    } catch (err) {
       error.value = err.data?.message || "Ошибка загрузки профиля";
       console.error("Ошибка загрузки профиля", err.data)
     } finally {
@@ -106,6 +106,6 @@ export const useProfileStore = defineStore("profile", () => {
     updateProfile,
     uploadAvatar,
     logout,
-    isAdminOrSupport
+    isAdminOrSupport,
   };
 });

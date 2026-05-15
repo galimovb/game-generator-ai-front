@@ -7,7 +7,7 @@ import {
   ChevronsUpDown,
   LogOut,
   UserPen,
-  ShieldCheck
+  ShieldCheck,
 } from "lucide-vue-next";
 
 const profileStore = useProfileStore();
@@ -40,18 +40,20 @@ const gamesGroup = {
   ],
 };
 
-const secondGroup = [
-  {
-    title: "Поддержка",
-    url: "/support",
-    icon: Headset,
-  },
-];
+const secondGroup = computed(() => {
+  const baseGroup = [{ title: "Поддержка", url: "/support", icon: Headset }];
+
+  if (!isAdminOrSupport.value) {
+    return baseGroup;
+  }
+
+  return [];
+});
 </script>
 
 <template>
   <Sidebar>
-    <SidebarHeader class="flex-row justify-between py-3 px-2">
+    <SidebarHeader class="flex-row justify-between py-3 px-3.5">
       <AppIcon />
       <SidebarTrigger class="md:hidden" />
     </SidebarHeader>

@@ -1,11 +1,19 @@
-import { AlertCircle, Clock, MessageSquare, CheckCircle2 } from "lucide-vue-next";
+import {
+  AlertCircle,
+  Clock,
+  MessageSquare,
+  CheckCircle2,
+} from "lucide-vue-next";
 
-export const ticketStatusConfig: Record<TicketStatus, {
-  label: string;
-  icon: any;
-  variant: "default" | "secondary" | "outline" | "success";
-  color: string;
-}> = {
+export const ticketStatusConfig: Record<
+  TicketStatus,
+  {
+    label: string;
+    icon: any;
+    variant: "default" | "secondary" | "outline" | "success";
+    color: string;
+  }
+> = {
   open: {
     label: "Открыт",
     icon: AlertCircle,

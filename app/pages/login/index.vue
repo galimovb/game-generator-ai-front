@@ -54,6 +54,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     );
     await navigateTo(isAdminOrSupport ? "/admin" : "/games/my");
   } catch (err) {
+    console.error("Ошибка при входе", err)
     $toast.error("Ошибка при входе");
   } finally {
     loading.value = false;

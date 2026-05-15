@@ -53,19 +53,6 @@ const gameSchema = toTypedSchema(
       locationDescription: z.string().optional(),
       photos: z.array(z.string()).optional(),
     })
-    .superRefine((data, ctx) => {
-      if (
-        (!data.photos || data.photos.length === 0) &&
-        (!data.locationDescription || data.locationDescription.trim() === "")
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["locationDescription"],
-          message:
-            "Если вы не прикрепили фото местности, обязательно укажите описание местности для учета ландшафта",
-        });
-      }
-    }),
 );
 
 const { handleSubmit, resetForm } = useForm({
@@ -132,6 +119,10 @@ const removePhoto = (index: number) => {
 };
 
 const onSubmit = handleSubmit(async (formValues) => {
+  if (photos.value.length === 0 && !formValues.locationDescription?.trim()) {
+    $toast.error("Если вы не прикрепили фото местности, обязательно укажите описание местности для учета ландшафта",);
+    return;
+  }
   try {
     isCreating.value = true;
 
@@ -213,7 +204,7 @@ const onClose = () => {
                 :src="preview"
                 class="w-full h-full object-cover"
                 alt="Preview"
-              >
+              />
               <button
                 class="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 w-5 h-5 flex items-center justify-center text-xs hover:opacity-80"
                 @click="removePhoto(index)"
@@ -233,7 +224,7 @@ const onClose = () => {
                 accept="image/*"
                 class="hidden"
                 @change="handlePhotoSelect"
-              >
+              />
             </label>
           </div>
         </div>
@@ -284,9 +275,9 @@ const onClose = () => {
                 </FormControl>
                 <SelectContent>
                   <SelectItem
-                      v-for="(value, key) in activityLevels"
-                      :key="key"
-                      :value="key"
+                    v-for="(value, key) in activityLevels"
+                    :key="key"
+                    :value="key"
                   >
                     {{ value }}
                   </SelectItem>
@@ -301,10 +292,10 @@ const onClose = () => {
               <FormLabel>Длительность (минут)</FormLabel>
               <FormControl>
                 <Input
-                    v-bind="componentField"
-                    type="number"
-                    :min="5"
-                    :max="480"
+                  v-bind="componentField"
+                  type="number"
+                  :min="5"
+                  :max="480"
                 />
               </FormControl>
               <FormMessage />
@@ -380,7 +371,7 @@ const onClose = () => {
                 placeholder="Опишите место проведения игры"
               />
             </FormControl>
-            <FormMessage/>
+            <FormMessage />
           </FormItem>
         </FormField>
 

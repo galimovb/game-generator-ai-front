@@ -1,34 +1,54 @@
 <script setup lang="ts">
-import { Camera, Loader, ImageIcon } from 'lucide-vue-next'
-import { toTypedSchema } from "@vee-validate/zod"
-import * as z from "zod"
-import { useForm } from "vee-validate"
+import { Camera, Loader, ImageIcon } from "lucide-vue-next";
+import { toTypedSchema } from "@vee-validate/zod";
+import * as z from "zod";
+import { useForm } from "vee-validate";
 import {
   FormField,
   FormItem,
   FormLabel,
   FormControl,
   FormMessage,
-} from "~/components/ui/form"
+} from "~/components/ui/form";
 
-const profileStore = useProfileStore()
-const { profile, loading, error, uploading, avatarUrl, fullName } = storeToRefs(profileStore)
+const profileStore = useProfileStore();
+const { profile, loading, error, uploading, avatarUrl, fullName } =
+  storeToRefs(profileStore);
 
-const isEditing = ref(false)
+const isEditing = ref(false);
 
 const profileSchema = toTypedSchema(
   z.object({
-    name: z.string().max(255, "Максимум 255 символов").optional().or(z.literal("")),
-    lastName: z.string().max(255, "Максимум 255 символов").optional().or(z.literal("")),
-    middleName: z.string().max(255, "Максимум 255 символов").optional().or(z.literal("")),
-    email: z.string().min(1, "Обязательное поле").email("Введите корректный email"),
-    login: z.string().max(255, "Максимум 255 символов").optional().or(z.literal("")),
-  })
-)
+    name: z
+      .string()
+      .max(255, "Максимум 255 символов")
+      .optional()
+      .or(z.literal("")),
+    lastName: z
+      .string()
+      .max(255, "Максимум 255 символов")
+      .optional()
+      .or(z.literal("")),
+    middleName: z
+      .string()
+      .max(255, "Максимум 255 символов")
+      .optional()
+      .or(z.literal("")),
+    email: z
+      .string()
+      .min(1, "Обязательное поле")
+      .email("Введите корректный email"),
+    login: z
+      .string()
+      .max(255, "Максимум 255 символов")
+      .optional()
+      .or(z.literal("")),
+  }),
+);
 
 const { handleSubmit, setValues, resetForm } = useForm({
   validationSchema: profileSchema,
-})
+});
 
 const initForm = () => {
   if (profile.value) {
@@ -38,38 +58,38 @@ const initForm = () => {
       middleName: profile.value.middleName || "",
       email: profile.value.email,
       login: profile.value.login || "",
-    })
+    });
   }
-}
+};
 
-watch(profile, initForm, { immediate: true })
+watch(profile, initForm, { immediate: true });
 
 const startEdit = () => {
-  initForm()
-  isEditing.value = true
-}
+  initForm();
+  isEditing.value = true;
+};
 
 const onSubmit = handleSubmit(async (formValues) => {
-  await profileStore.updateProfile(formValues)
-  isEditing.value = false
-})
+  await profileStore.updateProfile(formValues);
+  isEditing.value = false;
+});
 
 const handleAvatarSelect = async (event: Event) => {
-  const input = event.target as HTMLInputElement
-  if (!input.files?.length) return
+  const input = event.target as HTMLInputElement;
+  if (!input.files?.length) return;
 
   try {
-    await profileStore.uploadAvatar(input.files[0])
+    await profileStore.uploadAvatar(input.files[0]);
   } finally {
-    input.value = ''
+    input.value = "";
   }
-}
+};
 
 const cancelEdit = () => {
-  resetForm()
-  initForm()
-  isEditing.value = false
-}
+  resetForm();
+  initForm();
+  isEditing.value = false;
+};
 </script>
 
 <template>
@@ -85,11 +105,21 @@ const cancelEdit = () => {
             <Skeleton class="h-8 w-20" />
           </div>
           <div class="space-y-4">
-            <div><Skeleton class="h-4 w-12 mb-2" /><Skeleton class="h-10 w-full" /></div>
-            <div><Skeleton class="h-4 w-12 mb-2" /><Skeleton class="h-10 w-full" /></div>
-            <div><Skeleton class="h-4 w-12 mb-2" /><Skeleton class="h-10 w-full" /></div>
-            <div><Skeleton class="h-4 w-12 mb-2" /><Skeleton class="h-10 w-full" /></div>
-            <div><Skeleton class="h-4 w-12 mb-2" /><Skeleton class="h-10 w-full" /></div>
+            <div>
+              <Skeleton class="h-4 w-12 mb-2" /><Skeleton class="h-10 w-full" />
+            </div>
+            <div>
+              <Skeleton class="h-4 w-12 mb-2" /><Skeleton class="h-10 w-full" />
+            </div>
+            <div>
+              <Skeleton class="h-4 w-12 mb-2" /><Skeleton class="h-10 w-full" />
+            </div>
+            <div>
+              <Skeleton class="h-4 w-12 mb-2" /><Skeleton class="h-10 w-full" />
+            </div>
+            <div>
+              <Skeleton class="h-4 w-12 mb-2" /><Skeleton class="h-10 w-full" />
+            </div>
           </div>
         </div>
       </div>
@@ -104,27 +134,50 @@ const cancelEdit = () => {
       <div class="flex gap-8">
         <div class="relative w-28 h-28 md:w-48 md:h-48 flex-shrink-0">
           <div class="w-full h-full rounded-lg overflow-hidden border bg-muted">
-            <img v-if="avatarUrl" :src="avatarUrl" :alt="fullName" class="w-full h-full object-cover">
-            <div v-else class="flex justify-center items-center w-full h-full bg-muted">
+            <img
+              v-if="avatarUrl"
+              :src="avatarUrl"
+              :alt="fullName"
+              class="w-full h-full object-cover"
+            />
+            <div
+              v-else
+              class="flex justify-center items-center w-full h-full bg-muted"
+            >
               <ImageIcon :size="48" class="text-muted-foreground" />
             </div>
-            <div v-if="uploading" class="absolute inset-0 bg-background/50 flex items-center justify-center">
+            <div
+              v-if="uploading"
+              class="absolute inset-0 bg-background/50 flex items-center justify-center"
+            >
               <Loader class="w-8 h-8 animate-spin" />
             </div>
           </div>
 
-          <label v-if="!uploading" class="absolute -bottom-2 -right-2 cursor-pointer">
-            <div class="bg-primary text-primary-foreground rounded-full p-2.5 shadow-lg hover:bg-primary/90">
+          <label
+            v-if="!uploading"
+            class="absolute -bottom-2 -right-2 cursor-pointer"
+          >
+            <div
+              class="bg-primary text-primary-foreground rounded-full p-2.5 shadow-lg hover:bg-primary/90"
+            >
               <Camera class="w-5 h-5" />
             </div>
-            <input type="file" accept="image/*" class="hidden" @change="handleAvatarSelect">
+            <input
+              type="file"
+              accept="image/*"
+              class="hidden"
+              @change="handleAvatarSelect"
+            />
           </label>
         </div>
 
         <div class="flex-1">
           <div class="flex justify-between items-center mb-6">
             <h1 class="text-xl font-semibold">Профиль</h1>
-            <Button v-if="!isEditing" variant="link" @click="startEdit">Изменить</Button>
+            <Button v-if="!isEditing" variant="link" @click="startEdit"
+              >Изменить</Button
+            >
           </div>
 
           <form v-if="isEditing" class="space-y-4" @submit.prevent="onSubmit">
@@ -155,7 +208,9 @@ const cancelEdit = () => {
             <FormField v-slot="{ componentField }" name="email">
               <FormItem>
                 <FormLabel>Почта</FormLabel>
-                <FormControl><Input v-bind="componentField" type="email" /></FormControl>
+                <FormControl
+                  ><Input v-bind="componentField" type="email"
+                /></FormControl>
                 <FormMessage />
               </FormItem>
             </FormField>
@@ -177,23 +232,23 @@ const cancelEdit = () => {
           <div v-else class="space-y-4">
             <div>
               <Label>Имя</Label>
-              <div class="text-base">{{ profile?.name || '—' }}</div>
+              <div class="text-base">{{ profile?.name || "—" }}</div>
             </div>
             <div>
               <Label>Фамилия</Label>
-              <div class="text-base">{{ profile?.lastName || '—' }}</div>
+              <div class="text-base">{{ profile?.lastName || "—" }}</div>
             </div>
             <div>
               <Label>Отчество</Label>
-              <div class="text-base">{{ profile?.middleName || '—' }}</div>
+              <div class="text-base">{{ profile?.middleName || "—" }}</div>
             </div>
             <div>
               <Label>Почта</Label>
-              <div class="text-base">{{ profile?.email || '—' }}</div>
+              <div class="text-base">{{ profile?.email || "—" }}</div>
             </div>
             <div>
               <Label>Логин</Label>
-              <div class="text-base">{{ profile?.login || '—' }}</div>
+              <div class="text-base">{{ profile?.login || "—" }}</div>
             </div>
           </div>
         </div>

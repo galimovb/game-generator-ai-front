@@ -7,7 +7,7 @@ import { Menu } from "lucide-vue-next";
     <AppSidebar />
     <SidebarInset>
       <header
-        class="bg-muted border-b shadow-lg md:hidden sticky top-0 left-0 px-2 py-1"
+        class="bg-sidebar border-b shadow-lg md:hidden sticky top-0 left-0 px-2 py-1.5 z-[55] backdrop-blur"
       >
         <div class="flex items-center justify-between">
           <AppIcon />

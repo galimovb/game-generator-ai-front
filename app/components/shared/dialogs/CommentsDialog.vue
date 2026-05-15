@@ -51,7 +51,7 @@ const loadComments = async (reset = false) => {
 
   state.loading = true;
   try {
-    const res = await get(`/games/${props.gameId}/comments`, {
+    const res = await get<ListResponse<GameComment>>(`/games/${props.gameId}/comments`, {
       query: { page: state.page, limit: 20 },
     });
 
@@ -80,7 +80,7 @@ const submitComment = async () => {
 
   state.form.submitting = true;
   try {
-    const res = await post(`/games/${props.gameId}/comments`, {
+    const res = await post<SingleResponse<GameComment>>(`/games/${props.gameId}/comments`, {
       text: state.form.text,
       parentId: state.form.parentId || undefined,
     });
@@ -245,7 +245,7 @@ watch(
                     <div
                       class="flex items-center text-sm text-muted-foreground bg-muted/30 rounded-lg border border-muted-foreground/20 overflow-hidden"
                     >
-                      <div class="w-[4px] bg-primary self-stretch"/>
+                      <div class="w-[4px] bg-primary self-stretch" />
                       <div class="grid flex-1 py-1 px-2">
                         <span class="font-medium">{{
                           getUserFullName(

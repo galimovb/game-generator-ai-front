@@ -15,7 +15,7 @@ export const useSettingsStore = defineStore("settings", () => {
     states.loading = true;
     states.error = null;
     try {
-      const { result } = await get("/users/profile/settings");
+      const { result } = await get<SingleResponse<UserSettings>>("/users/profile/settings");
       states.settings = result;
     } catch (err: any) {
       states.error = err.data?.message || "Ошибка загрузки";
@@ -30,7 +30,7 @@ export const useSettingsStore = defineStore("settings", () => {
     states.loading = true;
     states.error = null;
     try {
-      const { result } = await patch("/users/profile/settings", data);
+      const { result } = await patch("/users/profile/settings/", data);
       Object.assign(states.settings, result);
     } catch (err: any) {
       $toast.error("Ошибка обновления настроек", {

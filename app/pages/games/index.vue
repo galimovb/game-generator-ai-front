@@ -65,16 +65,21 @@ watch(filterOpen, (open) => {
   if (open) Object.assign(pendingFilters, filters);
 });
 
-const locationTypeOptions = Object.entries(gameLocationTypes).map(([value, label]) => ({ value, label }));
-const activityLevelOptions = Object.entries(activityLevels).map(([value, label]) => ({ value, label }));
+const locationTypeOptions = Object.entries(gameLocationTypes).map(
+  ([value, label]) => ({ value, label }),
+);
+const activityLevelOptions = Object.entries(activityLevels).map(
+  ([value, label]) => ({ value, label }),
+);
 
-const hasActiveFilters = computed(() =>
-  filters.minAge != null ||
-  filters.maxAge != null ||
-  filters.locationType != null ||
-  filters.activityLevel != null ||
-  filters.minPlayers != null ||
-  filters.maxPlayers != null,
+const hasActiveFilters = computed(
+  () =>
+    filters.minAge != null ||
+    filters.maxAge != null ||
+    filters.locationType != null ||
+    filters.activityLevel != null ||
+    filters.minPlayers != null ||
+    filters.maxPlayers != null,
 );
 </script>
 
@@ -90,7 +95,11 @@ const hasActiveFilters = computed(() =>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem v-for="opt in sortOptions" :key="opt.value" :value="opt.value">
+            <SelectItem
+              v-for="opt in sortOptions"
+              :key="opt.value"
+              :value="opt.value"
+            >
               {{ opt.label }}
             </SelectItem>
           </SelectContent>
@@ -111,29 +120,59 @@ const hasActiveFilters = computed(() =>
 
             <div class="space-y-4">
               <div>
-                <Label class="text-xs text-muted-foreground mb-1.5 block">Возраст</Label>
+                <Label class="text-xs text-muted-foreground mb-1.5 block"
+                  >Возраст</Label
+                >
                 <div class="flex gap-2">
-                  <Input v-model.number="pendingFilters.minAge" type="number" placeholder="От" min="0" />
-                  <Input v-model.number="pendingFilters.maxAge" type="number" placeholder="До" min="0" />
+                  <Input
+                    v-model.number="pendingFilters.minAge"
+                    type="number"
+                    placeholder="От"
+                    min="0"
+                  />
+                  <Input
+                    v-model.number="pendingFilters.maxAge"
+                    type="number"
+                    placeholder="До"
+                    min="0"
+                  />
                 </div>
               </div>
 
               <div>
-                <Label class="text-xs text-muted-foreground mb-1.5 block">Количество игроков</Label>
+                <Label class="text-xs text-muted-foreground mb-1.5 block"
+                  >Количество игроков</Label
+                >
                 <div class="flex gap-2">
-                  <Input v-model.number="pendingFilters.minPlayers" type="number" placeholder="От" min="1" />
-                  <Input v-model.number="pendingFilters.maxPlayers" type="number" placeholder="До" min="1" />
+                  <Input
+                    v-model.number="pendingFilters.minPlayers"
+                    type="number"
+                    placeholder="От"
+                    min="1"
+                  />
+                  <Input
+                    v-model.number="pendingFilters.maxPlayers"
+                    type="number"
+                    placeholder="До"
+                    min="1"
+                  />
                 </div>
               </div>
 
               <div>
-                <Label class="text-xs text-muted-foreground mb-1.5 block">Место проведения</Label>
+                <Label class="text-xs text-muted-foreground mb-1.5 block"
+                  >Место проведения</Label
+                >
                 <Select v-model="pendingFilters.locationType">
                   <SelectTrigger class="w-full">
                     <SelectValue placeholder="Любое" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem v-for="opt in locationTypeOptions" :key="opt.value" :value="opt.value">
+                    <SelectItem
+                      v-for="opt in locationTypeOptions"
+                      :key="opt.value"
+                      :value="opt.value"
+                    >
                       {{ opt.label }}
                     </SelectItem>
                   </SelectContent>
@@ -141,13 +180,19 @@ const hasActiveFilters = computed(() =>
               </div>
 
               <div>
-                <Label class="text-xs text-muted-foreground mb-1.5 block">Активность</Label>
+                <Label class="text-xs text-muted-foreground mb-1.5 block"
+                  >Активность</Label
+                >
                 <Select v-model="pendingFilters.activityLevel">
                   <SelectTrigger class="w-full">
                     <SelectValue placeholder="Любая" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem v-for="opt in activityLevelOptions" :key="opt.value" :value="opt.value">
+                    <SelectItem
+                      v-for="opt in activityLevelOptions"
+                      :key="opt.value"
+                      :value="opt.value"
+                    >
                       {{ opt.label }}
                     </SelectItem>
                   </SelectContent>
@@ -156,7 +201,9 @@ const hasActiveFilters = computed(() =>
             </div>
 
             <div class="flex gap-2 mt-5">
-              <Button variant="outline" class="flex-1" @click="resetFilters">Сбросить</Button>
+              <Button variant="outline" class="flex-1" @click="resetFilters"
+                >Сбросить</Button
+              >
               <Button class="flex-1" @click="applyFilters">Применить</Button>
             </div>
           </PopoverContent>

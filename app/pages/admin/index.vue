@@ -45,7 +45,9 @@ const cards = computed(() =>
   <div class="py-8 px-6 max-w-7xl mx-auto">
     <div class="mb-8">
       <h1 class="text-2xl font-bold">Дашборд</h1>
-      <p class="text-muted-foreground text-sm mt-1">Обзор обращений пользователей</p>
+      <p class="text-muted-foreground text-sm mt-1">
+        Обзор обращений пользователей
+      </p>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -53,7 +55,9 @@ const cards = computed(() =>
         <Card class="hover:shadow-md transition-shadow cursor-pointer h-full">
           <CardContent class="p-5">
             <div class="flex items-center justify-between gap-3 mb-3">
-              <span class="text-sm text-muted-foreground">{{ card.title }}</span>
+              <span class="text-sm text-muted-foreground">{{
+                card.title
+              }}</span>
               <component :is="card.icon" :size="18" :class="card.color" />
             </div>
             <div v-if="loading">

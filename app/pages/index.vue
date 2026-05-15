@@ -53,7 +53,7 @@ const features = [
 const loadPopularGames = async () => {
   loadingGames.value = true;
   try {
-    const response = await get("/games", {
+    const response = await get<ListResponse<Game>>("/games", {
       query: { page: 1, limit: 3 },
     });
     popularGames.value = response.result.items;
@@ -172,7 +172,7 @@ onMounted(() => {
                 <img
                   :src="getPhotoUrl(game.photos[0])"
                   class="w-full h-48 object-cover rounded-lg border"
-                >
+                />
               </div>
               <div
                 v-else
