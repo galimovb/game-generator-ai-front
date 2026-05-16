@@ -1,5 +1,3 @@
-import { defineStore } from "pinia";
-
 export const useAppData = defineStore("appData", () => {
   const theme = useCookie<"light" | "dark">("theme", {
     default: () => "light",

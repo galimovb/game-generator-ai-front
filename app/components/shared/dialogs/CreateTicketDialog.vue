@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Loader2, Send, AlertCircle, Plus } from "lucide-vue-next";
+import { Loader2, Send, Plus } from "lucide-vue-next";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import { useForm } from "vee-validate";
@@ -54,7 +54,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     emit("success", ticket);
     open.value = false;
     resetForm();
-  } catch (err: any) {
+  } catch {
     $toast.error("Ошибка при создании тикета", {
       action: {
         label: "Повторить",

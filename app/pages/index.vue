@@ -249,7 +249,7 @@ const stats = [
                   <img
                     :src="getPhotoUrl(game.photos[0])"
                     class="w-full h-48 object-cover transition-transform duration-500 hover:scale-105"
-                  />
+                  >
                 </div>
                 <div
                   v-else

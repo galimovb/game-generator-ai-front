@@ -70,18 +70,18 @@ const onSubmit = handleSubmit(async (formValues) => {
   loading.value = true;
 
   try {
-    const body: Record<string, string> = {
+    const body: UserRegister = {
       email: formValues.email,
       password: formValues.password,
+      login: formValues.login || undefined,
+      name: formValues.name || undefined,
+      lastName: formValues.lastName || undefined,
+      middleName: formValues.middleName || undefined,
     };
-    if (formValues.login) body.login = formValues.login;
-    if (formValues.name) body.name = formValues.name;
-    if (formValues.lastName) body.lastName = formValues.lastName;
-    if (formValues.middleName) body.middleName = formValues.middleName;
 
     await post("/auth/register", body);
     await router.push("/login");
-  } catch (err: any) {
+  } catch {
     $toast.error("Ошибка при регистрации");
   } finally {
     loading.value = false;

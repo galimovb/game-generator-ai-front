@@ -14,7 +14,7 @@ interface PaginatedResult<T> {
   pagination: Pagination;
 }
 
-interface ApiError {
+export interface ApiError {
   error: string;
   errorMessage: string;
 }

@@ -9,7 +9,6 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-  FormDescription,
 } from "~/components/ui/form";
 import { Label } from "~/components/ui/label";
 
@@ -151,7 +150,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     resetFormAndState();
     emit("update:open", false);
     $toast.success("Игра успешно создана");
-  } catch (error) {
+  } catch {
     $toast.error("Ошибка создания игры", {
       action: {
         label: "Повторить",
@@ -205,7 +204,7 @@ const onClose = () => {
                 :src="preview"
                 class="w-full h-full object-cover"
                 alt="Preview"
-              />
+              >
               <button
                 class="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 w-5 h-5 flex items-center justify-center text-xs hover:opacity-80"
                 @click="removePhoto(index)"
@@ -225,7 +224,7 @@ const onClose = () => {
                 accept="image/*"
                 class="hidden"
                 @change="handlePhotoSelect"
-              />
+              >
             </label>
           </div>
         </div>

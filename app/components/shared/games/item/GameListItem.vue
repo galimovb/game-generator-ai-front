@@ -15,9 +15,9 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (e: "like:toggle", gameId: number): void;
-  (e: "comment:created", gameId: number): void;
-  (e: "comment:deleted", gameId: number): void;
+  "like:toggle": [gameId: number];
+  "comment:created": [gameId: number];
+  "comment:deleted": [gameId: number];
 }>();
 
 const showComments = ref(false);
@@ -34,7 +34,7 @@ const toggleLike = async () => {
       await post(`/games/${props.game.id}/like`);
     }
     emit("like:toggle", props.game.id);
-  } catch (e) {
+  } catch {
     $toast.error("Произошла ошибка", {
       action: {
         label: "Повторить",
@@ -72,7 +72,7 @@ const handleCommentDeleted = (gameId: number) => {
                   :src="getPhotoUrl(photo)"
                   class="w-full h-48 object-cover rounded-lg border"
                   :alt="`Game photo ${idx + 1}`"
-                />
+                >
               </div>
             </CarouselItem>
           </CarouselContent>

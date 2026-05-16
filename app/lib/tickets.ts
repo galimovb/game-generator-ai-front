@@ -10,7 +10,7 @@ export const ticketStatusConfig: Record<
   {
     label: string;
     icon: any;
-    variant: "default" | "secondary" | "outline" | "success";
+    variant: "default" | "secondary" | "outline" | "destructive";
     color: string;
   }
 > = {
@@ -35,13 +35,13 @@ export const ticketStatusConfig: Record<
   resolved: {
     label: "Решён",
     icon: CheckCircle2,
-    variant: "success",
+    variant: "default",
     color: "text-green-500",
   },
   closed: {
     label: "Закрыт",
     icon: CheckCircle2,
-    variant: "secondary",
+    variant: "destructive",
     color: "text-muted-foreground",
   },
 };

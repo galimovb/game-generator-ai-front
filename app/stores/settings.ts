@@ -40,7 +40,7 @@ export const useSettingsStore = defineStore("settings", () => {
         data,
       );
       Object.assign(states.settings, result);
-    } catch (err) {
+    } catch {
       $toast.error("Ошибка обновления настроек", {
         action: {
           label: "Повторить",

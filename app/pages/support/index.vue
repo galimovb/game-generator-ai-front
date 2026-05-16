@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { Send, ArrowLeft, Loader2, Paperclip, X } from "lucide-vue-next";
-import { ticketStatusConfig } from "~/lib/tickets";
+import { Send, ArrowLeft, Loader2, Paperclip, X, MessageSquare } from "lucide-vue-next";
 
 const router = useRouter();
 const route = useRoute();
@@ -614,7 +613,7 @@ const isMyMessage = (message: TicketMessage): boolean => {
                         :src="getPhotoUrl(photo)"
                         alt="Photo"
                         class="rounded-md max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
-                      />
+                      >
                     </div>
                   </div>
                   <User
@@ -657,7 +656,7 @@ const isMyMessage = (message: TicketMessage): boolean => {
                   :src="preview"
                   alt="Preview"
                   class="w-12 h-12 object-cover rounded-md"
-                />
+                >
                 <Button
                   variant="destructive"
                   size="icon"
@@ -677,7 +676,7 @@ const isMyMessage = (message: TicketMessage): boolean => {
                 accept="image/*"
                 class="hidden"
                 @change="handleFileSelect"
-              />
+              >
               <Button
                 variant="secondary"
                 size="icon"

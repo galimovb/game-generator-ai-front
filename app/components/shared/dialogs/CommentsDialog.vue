@@ -15,9 +15,9 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "update:open", value: boolean): void;
-  (e: "comment:created", gameId: number): void;
-  (e: "comment:deleted", gameId: number): void;
+  "update:open": [value: boolean];
+  "comment:created": [gameId: number];
+  "comment:deleted": [gameId: number];
 }>();
 
 const { get, post, del } = useApi();
@@ -66,7 +66,7 @@ const loadComments = async (reset = false) => {
 
     state.hasMore = state.comments.length < res.result.pagination.total;
     state.page++;
-  } catch (err) {
+  } catch {
     $toast.error("Ошибка загрузки комментариев", {
       action: {
         label: "Повторить",
@@ -94,7 +94,7 @@ const submitComment = async () => {
     state.form.text = "";
     state.form.parentId = null;
     emit("comment:created", props.gameId);
-  } catch (err) {
+  } catch {
     $toast.error("Ошибка отправки комментария", {
       action: {
         label: "Повторить",
@@ -112,7 +112,7 @@ const deleteComment = async (commentId: number) => {
     state.comments = state.comments.filter((c) => c.id !== commentId);
     emit("comment:deleted", props.gameId);
     $toast.success("Комментарий удален");
-  } catch (err) {
+  } catch {
     $toast.error("Ошибка удаления комментария", {
       action: {
         label: "Повторить",

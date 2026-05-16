@@ -3,7 +3,7 @@ const props = withDefaults(
   defineProps<{
     namePosition?: "left" | "right";
     showName?: boolean;
-    user: UserProfile;
+    user: UserProfile | undefined;
     size?: number;
     nameField?: "name" | "email" | "login";
   }>(),

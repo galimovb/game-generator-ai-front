@@ -19,6 +19,5 @@ export const formatDate = (date: string): string => {
 };
 
 export const goToGame = (gameId: number): void => {
-  const router = useRouter();
   navigateTo(`/games/${gameId}`);
 };

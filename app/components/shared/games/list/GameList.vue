@@ -9,9 +9,9 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "comment:created", gameId: number): void;
-  (e: "comment:deleted", gameId: number): void;
-  (e: "like:toggle", gameId: number): void;
+  "comment:created": [gameId: number];
+  "comment:deleted": [gameId: number];
+  "like:toggle": [gameId: number];
 }>();
 
 const handleCommentCreated = (gameId: number) => {

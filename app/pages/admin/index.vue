@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Headset } from "lucide-vue-next";
 
 definePageMeta({ layout: "admin", middleware: "admin" });
 

@@ -139,7 +139,7 @@ const cancelEdit = () => {
               :src="avatarUrl"
               :alt="fullName"
               class="w-full h-full object-cover"
-            />
+            >
             <div
               v-else
               class="flex justify-center items-center w-full h-full bg-muted"
@@ -168,7 +168,7 @@ const cancelEdit = () => {
               accept="image/*"
               class="hidden"
               @change="handleAvatarSelect"
-            />
+            >
           </label>
         </div>
 

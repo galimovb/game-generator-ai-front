@@ -43,16 +43,14 @@ const onSubmit = handleSubmit(async (formValues) => {
   loading.value = true;
 
   try {
-    await post("/auth/login", {
+    const body: UserLogin = {
       email: formValues.email,
       password: formValues.password,
-    });
+    };
+    await post("/auth/login", body);
 
     await profileStore.fetchProfile();
-    const isAdminOrSupport = profileStore.profile?.roles.some(
-      (role) => role === "ROLE_ADMIN" || role === "ROLE_SUPPORT",
-    );
-    await navigateTo(isAdminOrSupport ? "/admin" : "/games/my");
+    await navigateTo(profileStore.isAdminOrSupport ? "/admin" : "/games/my");
   } catch (err) {
     console.error("Ошибка при входе", err);
     $toast.error("Ошибка при входе");

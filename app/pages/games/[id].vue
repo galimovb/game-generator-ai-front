@@ -138,7 +138,7 @@ const loadData = async () => {
       });
       formRequisites.value = game.value.requisites || [];
     }
-  } catch (err: any) {
+  } catch {
     $toast.error("Произошла ошибка при загрузке игры", {
       action: {
         label: "Повторить",
@@ -200,8 +200,8 @@ const onSubmit = handleSubmit(async (formValues) => {
     const response = await patch(`/games/${game.value.id}`, body);
     game.value = response.result;
     isEditing.value = false;
-    toast.success("Изменения сохранены");
-  } catch (err: any) {
+    $toast.success("Изменения сохранены");
+  } catch {
     $toast.error("Ошибка сохранения изменений");
   } finally {
     saving.value = false;
@@ -242,8 +242,8 @@ const saveStageChanges = async (stageId: number) => {
       game.value.stages[stageIndex] = response.result;
     }
     cancelEditingStage();
-    toast.success("Стадия обновлена");
-  } catch (err: any) {
+    $toast.success("Стадия обновлена");
+  } catch {
     $toast.error("Ошибка сохранения стадии");
   } finally {
     savingStageId.value = null;
@@ -253,12 +253,12 @@ const saveStageChanges = async (stageId: number) => {
 const deleteStage = async (stageId: number) => {
   deletingStageId.value = stageId;
   try {
-    await del(`/games/${game.value.id}/stages/${stageId}`);
+    await del(`/games/${game.value?.id}/stages/${stageId}`);
     if (game.value) {
       game.value.stages = game.value.stages.filter((s) => s.id !== stageId);
     }
-    toast.success("Стадия удалена");
-  } catch (err: any) {
+    $toast.success("Стадия удалена");
+  } catch {
     $toast.error("Ошибка удаления стадии");
   } finally {
     deletingStageId.value = null;
@@ -268,13 +268,13 @@ const deleteStage = async (stageId: number) => {
 const deleteGame = async () => {
   try {
     isDeleting.value = true;
-    await del(`/games/${game.value.id}`);
+    await del(`/games/${game.value?.id}`);
     if (document.referrer) {
       window.location.href = document.referrer;
     } else {
       window.location.href = "/games";
     }
-  } catch (err: any) {
+  } catch {
     $toast.error("Ошибка удаления игры");
   } finally {
     isDeleting.value = false;
@@ -396,7 +396,7 @@ onMounted(async () => {
                     <img
                       :src="getPhotoUrl(photo)"
                       class="w-full h-64 object-cover rounded-lg"
-                    />
+                    >
                   </CarouselItem>
                 </CarouselContent>
                 <CarouselPrevious
@@ -856,7 +856,7 @@ onMounted(async () => {
 
                   <div v-if="editingStageId === stage.id" class="space-y-1">
                     <div
-                      v-for="(task, idx) in editingStageData.tasks"
+                      v-for="(task, idx) in editingStageData?.tasks"
                       :key="idx"
                       class="flex items-center gap-2 group"
                     >
@@ -929,7 +929,7 @@ onMounted(async () => {
                   <div v-if="editingStageId === stage.id" class="space-y-1">
                     <div class="flex flex-wrap gap-1">
                       <div
-                        v-for="(prop, idx) in editingStageData.props"
+                        v-for="(prop, idx) in editingStageData?.props"
                         :key="idx"
                         class="flex items-center gap-1 bg-muted px-2 py-1 rounded-md text-sm group"
                       >

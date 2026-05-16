@@ -771,7 +771,7 @@ const isAlreadyAssigned = computed(
                       :src="getPhotoUrl(photo)"
                       alt="Photo"
                       class="rounded-md max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
-                    />
+                    >
                   </div>
                 </div>
                 <User
@@ -813,7 +813,7 @@ const isAlreadyAssigned = computed(
                 :src="preview"
                 alt="Preview"
                 class="w-12 h-12 object-cover rounded-md"
-              />
+              >
               <Button
                 variant="destructive"
                 size="icon"
@@ -833,7 +833,7 @@ const isAlreadyAssigned = computed(
               accept="image/*"
               class="hidden"
               @change="handleFileSelect"
-            />
+            >
             <Button
               variant="secondary"
               size="icon"
