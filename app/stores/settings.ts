@@ -1,6 +1,7 @@
 export const useSettingsStore = defineStore("settings", () => {
   const { get, patch } = useApi();
   const { $toast } = useNuxtApp();
+  const { getErrorMessage } = useErrorHandler()
 
   const states = reactive({
     settings: {
@@ -16,11 +17,13 @@ export const useSettingsStore = defineStore("settings", () => {
     states.loading = true;
     states.error = null;
     try {
-      const { result } = await get<SingleResponse<UserSettings>>("/users/profile/settings");
+      const { result } = await get<SingleResponse<UserSettings>>(
+        "/users/profile/settings",
+      );
       states.settings = result;
       states.isLoaded = true;
-    } catch (err: any) {
-      states.error = err.data?.message || "Ошибка загрузки";
+    } catch (err) {
+      states.error = getErrorMessage(err);
     } finally {
       states.loading = false;
     }
@@ -32,9 +35,12 @@ export const useSettingsStore = defineStore("settings", () => {
     states.loading = true;
     states.error = null;
     try {
-      const { result } = await patch("/users/profile/settings/", data);
+      const { result } = await patch<SingleResponse<UserSettings>>(
+        "/users/profile/settings",
+        data,
+      );
       Object.assign(states.settings, result);
-    } catch (err: any) {
+    } catch (err) {
       $toast.error("Ошибка обновления настроек", {
         action: {
           label: "Повторить",

@@ -8,7 +8,6 @@ useHead({
     "data-font": fontSize.value,
   },
 });
-
 </script>
 
 <template>

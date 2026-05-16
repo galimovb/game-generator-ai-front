@@ -15,33 +15,30 @@ const {
   availableRadius,
 } = appData;
 
-const open = ref<boolean>(false);
-const creativityValue = ref<number>([states.settings?.generationCreative]);
-const modelValue = ref<ModelType>(states.settings.generationModel);
+const open = ref(false);
 
-// Синхронизация из стора
-watch(
-  () => states.settings?.generationCreative,
-  (val) => {
-    creativityValue.value = [val];
+const creativityValue = computed<[number]>({
+  get: () => [states.settings.generationCreative],
+  set: ([val]) => {
+    states.settings.generationCreative = val;
   },
-);
+});
 
-watch(
-  () => states.settings.generationModel,
-  (val) => {
-    modelValue.value = val;
+const modelValue = computed<ModelType>({
+  get: () => states.settings.generationModel,
+  set: (val) => {
+    states.settings.generationModel = val;
   },
-);
+});
 
-// Дебаунс сохранения обоих параметров
 watchDebounced(
-  [creativityValue, modelValue],
-  async ([creativity, model]) => {
-    await updateSettings({
-      generationCreative: creativity[0],
-      generationModel: model,
-    });
+  [
+    () => states.settings.generationCreative,
+    () => states.settings.generationModel,
+  ],
+  async ([generationCreative, generationModel]) => {
+    if (!states.isLoaded) return;
+    await updateSettings({ generationCreative, generationModel });
   },
   { debounce: 200 },
 );

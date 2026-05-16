@@ -51,9 +51,12 @@ const loadComments = async (reset = false) => {
 
   state.loading = true;
   try {
-    const res = await get<ListResponse<GameComment>>(`/games/${props.gameId}/comments`, {
-      query: { page: state.page, limit: 20 },
-    });
+    const res = await get<ListResponse<GameComment>>(
+      `/games/${props.gameId}/comments`,
+      {
+        query: { page: state.page, limit: 20 },
+      },
+    );
 
     if (reset) {
       state.comments = res.result.items;
@@ -80,10 +83,13 @@ const submitComment = async () => {
 
   state.form.submitting = true;
   try {
-    const res = await post<SingleResponse<GameComment>>(`/games/${props.gameId}/comments`, {
-      text: state.form.text,
-      parentId: state.form.parentId || undefined,
-    });
+    const res = await post<SingleResponse<GameComment>>(
+      `/games/${props.gameId}/comments`,
+      {
+        text: state.form.text,
+        parentId: state.form.parentId || undefined,
+      },
+    );
     state.comments.push(res.result);
     state.form.text = "";
     state.form.parentId = null;

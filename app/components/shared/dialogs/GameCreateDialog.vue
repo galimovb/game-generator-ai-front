@@ -26,33 +26,32 @@ const { post } = useApi();
 const { $toast } = useNuxtApp();
 
 const gameSchema = toTypedSchema(
-  z
-    .object({
-      age: z
-        .number({ message: "Обязательное поле" })
-        .min(3, "Минимум 3")
-        .max(80, "Максимум 80"),
-      players: z
-        .number({ message: "Обязательное поле" })
-        .min(1, "Минимум 1")
-        .max(500, "Максимум 500"),
-      duration: z
-        .number({ message: "Обязательное поле" })
-        .min(5, "Минимум 5 мин")
-        .max(480, "Максимум 480 мин"),
-      locationType: z.string({ message: "Обязательное поле" }),
-      fieldWidth: z
-        .number({ message: "Обязательное поле" })
-        .min(1, "Минимум 1")
-        .max(1000, "Максимум 1000"),
-      fieldLength: z
-        .number({ message: "Обязательное поле" })
-        .min(1, "Минимум 1")
-        .max(1000, "Максимум 1000"),
-      activityLevel: z.string({ message: "Обязательное поле" }),
-      locationDescription: z.string().optional(),
-      photos: z.array(z.string()).optional(),
-    })
+  z.object({
+    age: z
+      .number({ message: "Обязательное поле" })
+      .min(3, "Минимум 3")
+      .max(80, "Максимум 80"),
+    players: z
+      .number({ message: "Обязательное поле" })
+      .min(1, "Минимум 1")
+      .max(500, "Максимум 500"),
+    duration: z
+      .number({ message: "Обязательное поле" })
+      .min(5, "Минимум 5 мин")
+      .max(480, "Максимум 480 мин"),
+    locationType: z.string({ message: "Обязательное поле" }),
+    fieldWidth: z
+      .number({ message: "Обязательное поле" })
+      .min(1, "Минимум 1")
+      .max(1000, "Максимум 1000"),
+    fieldLength: z
+      .number({ message: "Обязательное поле" })
+      .min(1, "Минимум 1")
+      .max(1000, "Максимум 1000"),
+    activityLevel: z.string({ message: "Обязательное поле" }),
+    locationDescription: z.string().optional(),
+    photos: z.array(z.string()).optional(),
+  }),
 );
 
 const { handleSubmit, resetForm } = useForm({
@@ -120,7 +119,9 @@ const removePhoto = (index: number) => {
 
 const onSubmit = handleSubmit(async (formValues) => {
   if (photos.value.length === 0 && !formValues.locationDescription?.trim()) {
-    $toast.error("Если вы не прикрепили фото местности, обязательно укажите описание местности для учета ландшафта",);
+    $toast.error(
+      "Если вы не прикрепили фото местности, обязательно укажите описание местности для учета ландшафта",
+    );
     return;
   }
   try {

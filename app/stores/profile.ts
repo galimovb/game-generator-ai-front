@@ -35,7 +35,7 @@ export const useProfileStore = defineStore("profile", () => {
       isLoaded.value = true;
     } catch (err) {
       error.value = err.data?.message || "Ошибка загрузки профиля";
-      console.error("Ошибка загрузки профиля", err.data)
+      console.error("Ошибка загрузки профиля", err.data);
     } finally {
       loading.value = false;
     }
