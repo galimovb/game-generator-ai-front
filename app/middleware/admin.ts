@@ -1,7 +1,7 @@
 export default defineNuxtRouteMiddleware(async () => {
   const profileStore = useProfileStore();
 
-  if (!profileStore.profile && !profileStore.loading) {
+  if (!profileStore.isLoaded && !profileStore.loading) {
     await profileStore.fetchProfile();
   }
 
@@ -9,5 +9,5 @@ export default defineNuxtRouteMiddleware(async () => {
     return navigateTo("/login");
   }
 
-  return profileStore.isAdminOrSupport ? undefined : navigateTo("/");
+  return profileStore.isAdminOrSupport ? undefined : navigateTo("/games");
 });

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-  Home,
   Inbox,
   Headset,
   ChevronDown,
@@ -13,13 +12,6 @@ import {
 const profileStore = useProfileStore();
 const { logout } = profileStore;
 const { profile, isAdminOrSupport } = storeToRefs(profileStore);
-const firstGroup = [
-  {
-    title: "Главная",
-    url: "/",
-    icon: Home,
-  },
-];
 
 const gamesGroup = {
   title: "Игры",
@@ -40,15 +32,12 @@ const gamesGroup = {
   ],
 };
 
-const secondGroup = computed(() => {
-  const baseGroup = [{ title: "Поддержка", url: "/support", icon: Headset }];
-
-  if (!isAdminOrSupport.value) {
-    return baseGroup;
-  }
-
-  return [];
-});
+const secondGroup = computed(() => [
+  isAdminOrSupport.value
+    ? { title: "Админ панель", url: "/admin", icon: ShieldCheck }
+    : { title: "Поддержка", url: "/support", icon: Headset },
+  { title: "Профиль", url: "/profile", icon: UserPen },
+]);
 </script>
 
 <template>
@@ -58,21 +47,6 @@ const secondGroup = computed(() => {
       <SidebarTrigger class="md:hidden" />
     </SidebarHeader>
     <SidebarContent>
-      <SidebarGroup>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            <SidebarMenuItem v-for="item in firstGroup" :key="item.title">
-              <SidebarMenuButton as-child>
-                <NuxtLink :to="item.url" active-class="bg-sidebar-accent">
-                  <component :is="item.icon" />
-                  <span>{{ item.title }}</span>
-                </NuxtLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
-
       <SidebarGroup>
         <SidebarGroupContent>
           <SidebarMenu>
@@ -113,14 +87,6 @@ const secondGroup = computed(() => {
       <SidebarGroup class="mt-auto">
         <SidebarGroupContent>
           <SidebarMenu>
-            <SidebarMenuItem v-if="isAdminOrSupport">
-              <SidebarMenuButton as-child>
-                <NuxtLink to="/admin" active-class="bg-sidebar-accent">
-                  <ShieldCheck :size="18" />
-                  <span>Админ панель</span>
-                </NuxtLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
             <AppSettings />
             <SidebarMenuItem v-for="item in secondGroup" :key="item.title">
               <SidebarMenuButton as-child>
@@ -149,13 +115,6 @@ const secondGroup = computed(() => {
           <ChevronsUpDown :size="16" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" class="w-48">
-          <DropdownMenuItem as-child>
-            <NuxtLink to="/profile">
-              <UserPen />
-              Профиль
-            </NuxtLink>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
           <DropdownMenuItem @click="logout">
             <LogOut />
             Выйти

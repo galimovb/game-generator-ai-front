@@ -9,22 +9,6 @@ useHead({
   },
 });
 
-const profileStore = useProfileStore();
-const settingsStore = useSettingsStore();
-
-const route = useRoute();
-const authPages = ["/login", "/register"];
-
-const isAuthPage = computed(() => {
-  return authPages.includes(route.path);
-});
-
-if (!isAuthPage.value) {
-  await Promise.all([
-    profileStore.fetchProfile(),
-    settingsStore.fetchSettings(),
-  ]);
-}
 </script>
 
 <template>

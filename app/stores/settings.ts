@@ -8,6 +8,7 @@ export const useSettingsStore = defineStore("settings", () => {
       generationCreative: 0.7,
     } as UserSettings,
     loading: false as boolean,
+    isLoaded: false as boolean,
     error: null as string | null,
   });
 
@@ -17,6 +18,7 @@ export const useSettingsStore = defineStore("settings", () => {
     try {
       const { result } = await get<SingleResponse<UserSettings>>("/users/profile/settings");
       states.settings = result;
+      states.isLoaded = true;
     } catch (err: any) {
       states.error = err.data?.message || "Ошибка загрузки";
     } finally {
@@ -44,9 +46,18 @@ export const useSettingsStore = defineStore("settings", () => {
     }
   }
 
+  function reset() {
+    states.isLoaded = false;
+    states.settings = {
+      generationModel: "qwen/qwen3.6-plus",
+      generationCreative: 0.7,
+    } as UserSettings;
+  }
+
   return {
     states,
     fetchSettings,
     updateSettings,
+    reset,
   };
 });

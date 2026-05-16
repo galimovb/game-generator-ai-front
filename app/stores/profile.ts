@@ -5,6 +5,7 @@ export const useProfileStore = defineStore("profile", () => {
 
   const profile = ref<UserProfile | null>(null);
   const loading = ref(false);
+  const isLoaded = ref(false);
   const error = ref<string | null>(null);
   const uploading = ref(false);
 
@@ -31,6 +32,7 @@ export const useProfileStore = defineStore("profile", () => {
     try {
       const response = await get<SingleResponse<UserProfile>>("/users/profile");
       profile.value = response.result;
+      isLoaded.value = true;
     } catch (err) {
       error.value = err.data?.message || "Ошибка загрузки профиля";
       console.error("Ошибка загрузки профиля", err.data)
@@ -89,6 +91,8 @@ export const useProfileStore = defineStore("profile", () => {
     try {
       await post("/auth/logout");
       profile.value = null;
+      isLoaded.value = false;
+      useSettingsStore().reset();
       navigateTo("/login");
     } catch (e) {
       console.error("Ошибка выхода", e);
@@ -98,6 +102,7 @@ export const useProfileStore = defineStore("profile", () => {
   return {
     profile,
     loading,
+    isLoaded,
     error,
     uploading,
     avatarUrl,
