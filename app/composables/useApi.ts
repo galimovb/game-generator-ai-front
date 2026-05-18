@@ -1,10 +1,10 @@
 import { sendRedirect } from "h3";
 
+let isRefreshing = false;
+let refreshPromise: Promise<any> | null = null;
+
 export const useApi = () => {
   const { $api } = useNuxtApp();
-  let isRefreshing = false;
-  let refreshPromise: Promise<any> | null = null;
-
   const getCurrentUrl = () =>
     import.meta.server
       ? useRequestURL().pathname + useRequestURL().search

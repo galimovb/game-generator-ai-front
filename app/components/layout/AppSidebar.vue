@@ -11,7 +11,7 @@ import {
 
 const profileStore = useProfileStore();
 const { logout } = profileStore;
-const { profile, isAdminOrSupport } = storeToRefs(profileStore);
+const { profile, isAdminOrSupport, load, loading } = storeToRefs(profileStore);
 
 const gamesGroup = {
   title: "Игры",
@@ -105,13 +105,16 @@ const secondGroup = computed(() => [
         <DropdownMenuTrigger
           class="flex gap-2 items-center hover:bg-sidebar-accent rounded-md p-1"
         >
-          <User :show-name="false" :user="profile" :size="9" />
-          <div class="flex-1 grid text-sm text-left">
+          <Skeleton v-if="loading" class="flex-1 h-11"/>
+          <template v-else>
+            <User :show-name="false" :user="profile" :size="9" />
+            <div class="flex-1 grid text-sm text-left">
             <span class="truncate font-medium"
-              >{{ profile?.name }} {{ profile?.lastName }}</span
+            >{{ profile?.name }} {{ profile?.lastName }}</span
             >
-            <span class="truncate">{{ profile?.email }}</span>
-          </div>
+              <span class="truncate">{{ profile?.email }}</span>
+            </div>
+          </template>
           <ChevronsUpDown :size="16" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" class="w-48">
