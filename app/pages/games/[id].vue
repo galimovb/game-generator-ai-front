@@ -7,6 +7,7 @@ import {
   Pencil,
   Trash2,
   Image as ImageIcon,
+  FileDown,
 } from "lucide-vue-next";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
@@ -15,6 +16,8 @@ import { useForm } from "vee-validate";
 const route = useRoute();
 const { get, patch, del } = useApi();
 const { $toast } = useNuxtApp();
+
+const { exportToPdf } = useGamePdf();
 
 const profileStore = useProfileStore();
 const { profile } = storeToRefs(profileStore);
@@ -344,6 +347,14 @@ onMounted(async () => {
           </CardTitle>
 
           <div v-if="!loading && isAuthor && !isEditing" class="flex gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              title="Скачать PDF"
+              @click="game && exportToPdf(game)"
+            >
+              <FileDown :size="16" />
+            </Button>
             <Button variant="link" size="sm" @click="startEditing"
               >Изменить</Button
             >
@@ -375,12 +386,17 @@ onMounted(async () => {
             </AlertDialog>
           </div>
 
-          <User
-            v-if="!isAuthor && !loading"
-            :user="game?.author"
-            :size="9"
-            name-field="email"
-          />
+          <div v-if="!isAuthor && !loading" class="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              title="Скачать PDF"
+              @click="game && exportToPdf(game)"
+            >
+              <FileDown :size="16" />
+            </Button>
+            <User :user="game?.author" :size="9" name-field="email" />
+          </div>
           <Skeleton v-if="loading" class="h-10" />
         </div>
       </CardHeader>
