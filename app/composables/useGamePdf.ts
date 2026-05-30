@@ -9,7 +9,8 @@ const loadFonts = async () => {
     const buf = await fetch(url).then((r) => r.arrayBuffer());
     const bytes = new Uint8Array(buf);
     let binary = "";
-    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    for (let i = 0; i < bytes.length; i++)
+      binary += String.fromCharCode(bytes[i]);
     return btoa(binary);
   };
   const [regular, bold] = await Promise.all([
@@ -24,7 +25,11 @@ export const useGamePdf = () => {
   const exportToPdf = async (game: Game) => {
     const fonts = await loadFonts();
 
-    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
 
     doc.addFileToVFS("Roboto-Regular.ttf", fonts.regular);
     doc.addFileToVFS("Roboto-Medium.ttf", fonts.bold);
@@ -77,15 +82,26 @@ export const useGamePdf = () => {
     drawDivider();
 
     // Параметры
-    const locType = gameLocationTypes[game.locationType as keyof typeof gameLocationTypes] || game.locationType || "—";
-    const actLevel = activityLevels[game.activityLevel as keyof typeof activityLevels] || game.activityLevel || "—";
+    const locType =
+      gameLocationTypes[game.locationType as keyof typeof gameLocationTypes] ||
+      game.locationType ||
+      "—";
+    const actLevel =
+      activityLevels[game.activityLevel as keyof typeof activityLevels] ||
+      game.activityLevel ||
+      "—";
 
     const info: [string, string][] = [
       ["Возраст:", game.age ? `${game.age} лет` : "—"],
       ["Игроки:", game.players ? `${game.players} чел` : "—"],
       ["Длительность:", game.duration ? `${game.duration} мин` : "—"],
       ["Локация:", locType],
-      ["Площадка:", game.fieldWidth && game.fieldLength ? `${game.fieldWidth} × ${game.fieldLength} м` : "—"],
+      [
+        "Площадка:",
+        game.fieldWidth && game.fieldLength
+          ? `${game.fieldWidth} × ${game.fieldLength} м`
+          : "—",
+      ],
       ["Активность:", actLevel],
       ["Статус:", game.isPublic ? "Публичная" : "Черновик"],
     ];
@@ -118,7 +134,8 @@ export const useGamePdf = () => {
 
     if (game.requisites?.length) {
       drawWrappedText("Реквизит", 11, true, [80, 80, 80]);
-      for (const r of game.requisites) drawWrappedText(`• ${r}`, 10, false, [33, 33, 33], 4);
+      for (const r of game.requisites)
+        drawWrappedText(`• ${r}`, 10, false, [33, 33, 33], 4);
       y += 2;
     }
 
@@ -138,7 +155,9 @@ export const useGamePdf = () => {
         doc.setFont("Roboto", "normal");
         doc.setTextColor(120, 120, 120);
         doc.setFontSize(10);
-        doc.text(`${stage.duration} мин`, PAGE_W - MARGIN, y, { align: "right" });
+        doc.text(`${stage.duration} мин`, PAGE_W - MARGIN, y, {
+          align: "right",
+        });
         y += lineH(11) + 1;
 
         if (stage.description) drawWrappedText(stage.description, 10);
@@ -146,7 +165,8 @@ export const useGamePdf = () => {
         if (stage.tasks?.length) {
           y += 2;
           drawWrappedText("Задания:", 9, true, [120, 120, 120]);
-          for (const t of stage.tasks) drawWrappedText(`• ${t}`, 9, false, [33, 33, 33], 6);
+          for (const t of stage.tasks)
+            drawWrappedText(`• ${t}`, 9, false, [33, 33, 33], 6);
         }
 
         if (stage.props?.length) {

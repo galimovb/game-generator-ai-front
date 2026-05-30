@@ -346,8 +346,9 @@ onMounted(async () => {
             <template v-else>{{ game?.title || "Без названия" }}</template>
           </CardTitle>
 
-          <div v-if="!loading && isAuthor && !isEditing" class="flex gap-2">
+          <div class="flex gap-2">
             <Button
+              v-if="!loading && !isEditing"
               variant="ghost"
               size="sm"
               title="Скачать PDF"
@@ -355,35 +356,46 @@ onMounted(async () => {
             >
               <FileDown :size="16" />
             </Button>
-            <Button variant="link" size="sm" @click="startEditing"
-              >Изменить</Button
-            >
-            <AlertDialog>
-              <AlertDialogTrigger as-child>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  class="hover:text-destructive"
-                >
-                  <Trash2 :size="16" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Вы уверены?</AlertDialogTitle>
-                  <AlertDialogDescription
-                    >Восстановить игру будет невозможно</AlertDialogDescription
+            <template v-if="!loading && isAuthor && !isEditing">
+              <Button
+                variant="ghost"
+                size="sm"
+                title="Редактировать игру"
+                @click="startEditing"
+              >
+                <Pencil :size="16" />
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger as-child>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    class="hover:text-destructive"
                   >
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Отмена</AlertDialogCancel>
-                  <AlertDialogAction class="bg-destructive" @click="deleteGame">
-                    <Loader v-if="isDeleting" class="animate-spin" />
-                    <span v-else>Удалить</span>
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                    <Trash2 :size="16" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Вы уверены?</AlertDialogTitle>
+                    <AlertDialogDescription
+                      >Восстановить игру будет
+                      невозможно</AlertDialogDescription
+                    >
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Отмена</AlertDialogCancel>
+                    <AlertDialogAction
+                      class="bg-destructive"
+                      @click="deleteGame"
+                    >
+                      <Loader v-if="isDeleting" class="animate-spin" />
+                      <span v-else>Удалить</span>
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </template>
           </div>
 
           <div v-if="!isAuthor && !loading" class="flex items-center gap-2">

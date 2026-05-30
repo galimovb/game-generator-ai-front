@@ -105,13 +105,13 @@ const secondGroup = computed(() => [
         <DropdownMenuTrigger
           class="flex gap-2 items-center hover:bg-sidebar-accent rounded-md p-1"
         >
-          <Skeleton v-if="loading" class="flex-1 h-11"/>
+          <Skeleton v-if="loading" class="flex-1 h-11" />
           <template v-else>
             <User :show-name="false" :user="profile" :size="9" />
             <div class="flex-1 grid text-sm text-left">
-            <span class="truncate font-medium"
-            >{{ profile?.name }} {{ profile?.lastName }}</span
-            >
+              <span class="truncate font-medium"
+                >{{ profile?.name }} {{ profile?.lastName }}</span
+              >
               <span class="truncate">{{ profile?.email }}</span>
             </div>
           </template>

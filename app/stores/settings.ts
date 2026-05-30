@@ -1,7 +1,7 @@
 export const useSettingsStore = defineStore("settings", () => {
   const { get, patch } = useApi();
   const { $toast } = useNuxtApp();
-  const { getErrorMessage } = useErrorHandler()
+  const { getErrorMessage } = useErrorHandler();
 
   const states = reactive({
     settings: {

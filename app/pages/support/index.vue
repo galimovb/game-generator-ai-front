@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { Send, ArrowLeft, Loader2, Paperclip, X, MessageSquare } from "lucide-vue-next";
+import {
+  Send,
+  ArrowLeft,
+  Loader2,
+  Paperclip,
+  X,
+  MessageSquare,
+} from "lucide-vue-next";
 
 const router = useRouter();
 const route = useRoute();
