@@ -346,7 +346,7 @@ onMounted(async () => {
             <template v-else>{{ game?.title || "Без названия" }}</template>
           </CardTitle>
 
-          <div class="flex gap-2">
+          <div class="flex gap-2 items-center">
             <Button
               v-if="!loading && !isEditing"
               variant="ghost"
@@ -396,18 +396,7 @@ onMounted(async () => {
                 </AlertDialogContent>
               </AlertDialog>
             </template>
-          </div>
-
-          <div v-if="!isAuthor && !loading" class="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              title="Скачать PDF"
-              @click="game && exportToPdf(game)"
-            >
-              <FileDown :size="16" />
-            </Button>
-            <User :user="game?.author" :size="9" name-field="email" />
+            <User v-if="!isAuthor && !loading" :user="game?.author" :size="9" name-field="email" />
           </div>
           <Skeleton v-if="loading" class="h-10" />
         </div>

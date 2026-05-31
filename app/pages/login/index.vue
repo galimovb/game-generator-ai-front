@@ -86,8 +86,10 @@ const onSubmit = handleSubmit(async (formValues) => {
             <FormItem>
               <div class="flex items-center">
                 <FormLabel>Пароль</FormLabel>
-                <a href="#" class="ml-auto inline-block text-sm underline"
-                  >Забыли пароль?</a
+                <NuxtLink
+                  to="/forgot-password"
+                  class="ml-auto inline-block text-sm underline"
+                  >Забыли пароль?</NuxtLink
                 >
               </div>
               <FormControl>
